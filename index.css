@@ -1,0 +1,25 @@
+
+/*
+ * index.css
+ * Visual Traceroute Project
+ * TeamBaconFiesta <TeamBaconFiesta@gmail.com>
+ * 
+ * CSS page of the index.html page 
+ * */
+ 
+ 
+html, body {
+	height: 100%;
+	width: 100%;	
+}
+
+
+#Traceroute {
+	text-align: center;
+}
+
+
+/* Elements p located right after input tags */
+input + p{
+	display: inline;
+}

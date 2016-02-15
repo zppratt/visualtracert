@@ -1,0 +1,43 @@
+<!--
+	<index.html>
+   
+	Copyright 2016 TeamBaconFiesta <TeamBaconFiesta@gmail.com>
+
+	This is the index.html page of the Visual TraceRoute Project
+	
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<title>Visual Traceroute</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<meta name="generator" content="Geany 1.23.1" />
+	<link rel="stylesheet" type="text/css" href="index.css">
+</head>
+
+<body>
+	
+	<div id="Traceroute">
+		<h2>IP Address</h2>
+		<p>Enter the IP address you want to trace the route to below:</p> <br/>
+		<form method="get" action="traceroute.php">
+
+		<!-- /!\ JUST FOR TEST /!\
+
+			TODO: replace the submit button with a JS function that verifies the input and sends a JSON object asynchronously via Ajax 
+
+		-->
+
+			<input name="field1" type="number" min="0" max="255" placeholder="255" required> <p>.</p>
+			<input name="field2" type="number" min="0" max="255" placeholder="255" required> <p>.</p>
+			<input name="field3" type="number" min="0" max="255" placeholder="255" required> <p>.</p>
+			<input name="field4" type="number" min="0" max="255" placeholder="255" required> <br/>
+			<button type="submit">Traceroute!</button>
+		</form>
+	</div>
+</body>
+
+</html>
