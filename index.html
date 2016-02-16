@@ -1,6 +1,5 @@
 <!--
-	<index.html>
-   
+
 	Copyright 2016 TeamBaconFiesta <TeamBaconFiesta@gmail.com>
 
 	This is the index.html page of the Visual TraceRoute Project
@@ -16,28 +15,26 @@
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="Geany 1.23.1" />
 	<link rel="stylesheet" type="text/css" href="index.css">
+	<script type="text/javascript" src="js/validateKey.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+		  $('#button').click(function() {
+		    ValidateIPaddress($('#ipaddress').val())
+		  });
+		});
+	</script>
 </head>
 
 <body>
-	
-	<div id="Traceroute">
-		<h2>IP Address</h2>
-		<p>Enter the IP address you want to trace the route to below:</p> <br/>
-		<form method="get" action="traceroute.php">
-
-		<!-- /!\ JUST FOR TEST /!\
-
-			TODO: replace the submit button with a JS function that verifies the input and sends a JSON object asynchronously via Ajax 
-
-		-->
-
-			<input name="field1" type="number" min="0" max="255" placeholder="255" required> <p>.</p>
-			<input name="field2" type="number" min="0" max="255" placeholder="255" required> <p>.</p>
-			<input name="field3" type="number" min="0" max="255" placeholder="255" required> <p>.</p>
-			<input name="field4" type="number" min="0" max="255" placeholder="255" required> <br/>
-			<button type="submit">Traceroute!</button>
-		</form>
-	</div>
+  <div id="Traceroute">
+    <h2>IP Address</h2>
+    <p>Enter the IP address you want to trace the route to below:</p>
+    <input id="ipaddress" name="ipaddress" placeholder="255.255.255.255" required>
+    <br/>
+    <br/>
+    <button type="button" id="button">Traceroute!</button>
+  </div>
 </body>
 
 </html>
