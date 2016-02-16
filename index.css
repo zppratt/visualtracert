@@ -23,3 +23,7 @@ html, body {
 input + p{
 	display: inline;
 }
+
+#ipaddress {
+	text-align: center;
+}
