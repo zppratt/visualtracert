@@ -20,7 +20,9 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 		  $('#button').click(function() {
-		    ValidateIPaddress($('#ipaddress').val())
+		  	ipaddress = $('#ipaddress').val();
+		  	if(ValidateIPaddress(ipaddress) == true)
+		    	sendTracerouteRequest(ipaddress);
 		  });
 		});
 	</script>

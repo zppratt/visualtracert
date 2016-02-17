@@ -1,19 +1,12 @@
 <?php
 
 
-/* 
-	/!\ JUST FOR TEST /!\
-	Retrieves the 4 parts of the input IP address
-*/
-$field1 = $_GET["field1"];
-$field2 = $_GET["field2"];
-$field3 = $_GET["field3"];
-$field4 = $_GET["field4"];
+/* Getting contents from JSON string sent */
+$requestReceived = file_get_contents('php://input');
 
-echo $field1.".";
-echo $field2.".";
-echo $field3.".";
-echo $field4."<br>";
+/* Decoding the JSON object in a php array 
+ * ipAddress is supposed to have the right format*/
+$ipAddress = json_decode($requestReceived, true);
 
 
 $returnValue;
@@ -24,7 +17,7 @@ $tracerouteOutput = array();
 	TODO: Find a way to make it asynchronous so we can look for geolocation and update the client page as traceroute is running
 
 */
-exec("traceroute ".$field1.".".$field2.".".$field3.".".$field4, $tracerouteOutput, $returnValue);
+exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue);
 
 foreach($tracerouteOutput as $stringValue) {
 	echo $stringValue . '<br>';
