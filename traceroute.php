@@ -4,9 +4,16 @@
 /* Getting contents from JSON string sent */
 $requestReceived = file_get_contents('php://input');
 
-/* Decoding the JSON object in a php array 
- * ipAddress is supposed to have the right format*/
+/* Decoding the JSON object in a php array */
 $ipAddress = json_decode($requestReceived, true);
+
+ /* ipAddress is supposed to have the right format, but we check on the server side again */
+$ipAddress = filter_var($ipAddress, FILTER_VALIDATE_IP);
+
+if($ipAddress == FALSE) { // couldn't filer an ip address, therefore the format wasn't correct
+	echo "Bad IP address format. Aborting."
+	exit(1)
+}
 
 
 $returnValue;
