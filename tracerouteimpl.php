@@ -27,32 +27,41 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to [http://unlicense.org]
 */
 
+/*
+ * Implementation has been modified so that we can use it as a function instead of a predefined script
+ * Doing so, we can retrieve only the IP addresses and coordinates, and ignore the statistics output, etc
+ *
+ */
+
     define ("SOL_IP", 0);
     define ("IP_TTL", 2);    // On OSX, use '4' instead of '2'.
     
-    echo"\n ============================ PHP-Traceroute ============================\n\n";
-    
-    if (!isset($argv[1]) || $argv[1] == "-h" || $argv[1] == "--help") {
-        // Show the helppage
-        echo "   Usage: sudo php ".$argv[0]." [args] host\n\n";
-        echo "   The available args are:\n";
-        echo "       -h, --help    Show this Help\n";
-        echo "       -g            Show GeoIP lookup for the hosts\n";
-        echo "\n";
-        echo "   Example: sudo php ".$argv[0]." -g github.com\n";
+    /* We don't need it, script will be used from other php file and not command line */
+    function echoUsage() {
+        echo"\n ============================ PHP-Traceroute ============================\n\n";
         
-        echo "\n =======================================================================\n\n";
-        exit;
+        if (!isset($argv[1]) || $argv[1] == "-h" || $argv[1] == "--help") {
+            // Show the helppage
+            echo "   Usage: sudo php ".$argv[0]." [args] host\n\n";
+            echo "   The available args are:\n";
+            echo "       -h, --help    Show this Help\n";
+            echo "       -g            Show GeoIP lookup for the hosts\n";
+            echo "\n";
+            echo "   Example: sudo php ".$argv[0]." -g github.com\n";
+            
+            echo "\n =======================================================================\n\n";
+            exit;
+        }
+        
+        if ($argv[1] == "-g"){
+            $dest_url = $argv[2];
+        } else {
+            $dest_url = $argv[1];
+        }
     }
     
-    if ($argv[1] == "-g"){
-        $dest_url = $argv[2];
-    } else {
-        $dest_url = $argv[1];
-    }
-    
-    $maximum_hops = 30;
-    $port = 33434;  // Standard port that traceroute programs use. Could be anything actually.
+   // $maximum_hops = 30;
+   // $port = 33434;  // Standard port that traceroute programs use. Could be anything actually.
     
     function ip2geo ($host) {
         global $argv;
@@ -68,76 +77,90 @@ For more information, please refer to [http://unlicense.org]
         }
     }
     
-    // Get IP from URL
-    $dest_addr = gethostbyname ($dest_url);
-    print "Tracerouting to destination: $dest_addr\n";
+    function traceroute($dest_addr) {
+        $maximum_hops = 30;
+        $port = 33434;
+        $resultsRecvAddresses = array();
+        $resultsRecvGeo = array();
 
-    $ttl = 1;
-    while ($ttl < $maximum_hops) {
-        // Create ICMP and UDP sockets
-        $recv_socket = socket_create (AF_INET, SOCK_RAW, getprotobyname ('icmp'));
-        $send_socket = socket_create (AF_INET, SOCK_DGRAM, getprotobyname ('udp'));
+        // Get IP from URL
+        //$dest_addr = gethostbyname ($dest_url);
+        //print "Tracerouting to destination: $dest_addr\n";
 
-        // Set TTL to current lifetime
-        socket_set_option ($send_socket, SOL_IP, IP_TTL, $ttl);
+        $ttl = 1;
+        while ($ttl < $maximum_hops) {
+            // Create ICMP and UDP sockets
+            $recv_socket = socket_create (AF_INET, SOCK_RAW, getprotobyname ('icmp'));
+            $send_socket = socket_create (AF_INET, SOCK_DGRAM, getprotobyname ('udp'));
 
-        // Bind receiving ICMP socket to default IP (no port needed since it's ICMP)
-        socket_bind ($recv_socket, 0, 0);
+            // Set TTL to current lifetime
+            socket_set_option ($send_socket, SOL_IP, IP_TTL, $ttl);
 
-        // Save the current time for roundtrip calculation
-        $t1 = microtime (true);
+            // Bind receiving ICMP socket to default IP (no port needed since it's ICMP)
+            socket_bind ($recv_socket, 0, 0);
 
-        // Send a zero sized UDP packet towards the destination
-        socket_sendto ($send_socket, "", 0, 0, $dest_addr, $port);
+            // Save the current time for roundtrip calculation
+            $t1 = microtime (true);
 
-        // Wait for an event to occur on the socket or timeout after 5 seconds. This will take care of the
-        // hanging when no data is received (packet is dropped silently for example)
-        $r = array ($recv_socket);
-        $w = $e = array ();
-        socket_select ($r, $w, $e, 5, 0);
+            // Send a zero sized UDP packet towards the destination
+            socket_sendto ($send_socket, "", 0, 0, $dest_addr, $port);
 
-        // Nothing to read, which means a timeout has occurred.
-        if (count ($r)) {
-            // Receive data from socket (and fetch destination address from where this data was found)
-            socket_recvfrom ($recv_socket, $buf, 512, 0, $recv_addr, $recv_port);
+            // Wait for an event to occur on the socket or timeout after 5 seconds. This will take care of the
+            // hanging when no data is received (packet is dropped silently for example)
+            $r = array ($recv_socket);
+            $w = $e = array ();
+            socket_select ($r, $w, $e, 5, 0);
 
-            // Calculate the roundtrip time
-            $roundtrip_time = ( microtime(true) - $t1 ) * 1000;
+            // Nothing to read, which means a timeout has occurred.
+            if (count ($r)) {
+                // Receive data from socket (and fetch destination address from where this data was found)
+                socket_recvfrom ($recv_socket, $buf, 512, 0, $recv_addr, $recv_port);
 
-            // No decent address found, display a * instead
-            if (empty ($recv_addr)) {
-                $recv_addr = "*";
-                $recv_name = "*";
-            } else {
-                // Otherwise, fetch the hostname and geoinfo for the address found
-                $recv_name = gethostbyaddr ($recv_addr);
-                if ($argv[1] == "-g") {
-                    $recv_geo = ip2geo ($recv_addr);
+                // Calculate the roundtrip time
+                $roundtrip_time = ( microtime(true) - $t1 ) * 1000;
+
+                // No decent address found, display a * instead
+                if (empty ($recv_addr)) {
+                    $recv_addr = "*";
+                    $recv_name = "*";
+                } else {
+                    // Otherwise, fetch the hostname and geoinfo for the address found
+                    $recv_name = gethostbyaddr ($recv_addr);
+                    if ($argv[1] == "-g") {
+                        $recv_geo = ip2geo ($recv_addr);
+                    }
                 }
-            }
 
-            // Print statistics
-            if ($argv[1] == "-g") {
-                printf ("%3d   %-15s  %.3f ms  %-30s  %s\n", $ttl, $recv_addr,  $roundtrip_time, $recv_geo, $recv_name);
+                // Append results to the results arrays
+                array_push($resultsRecvAddresses, $recv);
+                array_push($resultsRecvGeo, $recv_geo);
+
+                // Print statistics
+               /* if ($argv[1] == "-g") {
+                    printf ("%3d   %-15s  %.3f ms  %-30s  %s\n", $ttl, $recv_addr,  $roundtrip_time, $recv_geo, $recv_name);
+                } else {
+                    printf ("%3d   %-15s  %.3f ms  %s\n", $ttl, $recv_addr,  $roundtrip_time, $recv_name);
+                }*/
             } else {
-                printf ("%3d   %-15s  %.3f ms  %s\n", $ttl, $recv_addr,  $roundtrip_time, $recv_name);
-            }
-        } else {
-            // A timeout has occurred, display a timeout
-            printf ("%3d   (timeout)\n", $ttl);
+                // A timeout has occurred, display a timeout
+                //printf ("%3d   (timeout)\n", $ttl);
+            } 
+
+            // Close sockets
+            socket_close ($recv_socket);
+            socket_close ($send_socket);
+
+            // Increase TTL so we can fetch the next hop
+            $ttl++;
+
+            // When we have hit our destination, stop the traceroute
+            if ($recv_addr == $dest_addr) break;
         }
 
-        // Close sockets
-        socket_close ($recv_socket);
-        socket_close ($send_socket);
-
-        // Increase TTL so we can fetch the next hop
-        $ttl++;
-
-        // When we have hit our destination, stop the traceroute
-        if ($recv_addr == $dest_addr) break;
+        // Returning both arrays
+        return array($resultsRecvAddresses, $resultsRecvGeo);
     }
     
-    echo "\n ======================================================================\n\n";
+   // echo "\n ======================================================================\n\n";
 
 ?>

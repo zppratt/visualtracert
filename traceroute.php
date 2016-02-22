@@ -22,9 +22,16 @@ $tracerouteOutput = array();
 	TODO: Find a way to make it asynchronous so we can look for geolocation and update the client page as traceroute is running
 
 */
-exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue);
+//exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue);
 
-echo json_encode($tracerouteOutput)
+//echo json_encode($tracerouteOutput);
+
+require('tracerouteimpl.php');
+
+$tracerouteResults = traceroute($ipAddress);
+
+// send to client 
+echo json_encode($tracerouteResults[0]);
 
 /*foreach($tracerouteOutput as $stringValue) {
 	echo $stringValue . '<br>';
