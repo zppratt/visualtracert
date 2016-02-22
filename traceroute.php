@@ -30,6 +30,7 @@ require('tracerouteimpl.php');
 
 $tracerouteResults = traceroute($ipAddress);
 
+
 // send to client 
 echo json_encode($tracerouteResults[0]);
 
