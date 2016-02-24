@@ -78,10 +78,11 @@ https://github.com/jaytaph/traceroute.git
         if ($data) {
             $data = json_decode($data);
             // Return the countrycode, the regionname and the city
-            return $data->country_code.": ".$data->region_name.": ".$data->city;
+            //return $data->country_code.": ".$data->region_name.": ".$data->city;
+            return $data;
         } else {
             // An error has accourred
-            return "(No geo info found)";
+            return NULL;
         }
     }
     

@@ -62,12 +62,16 @@ $HopsIpAddresses = executeTraceroute($ipAddress);
 
 echo json_encode($HopsIpAddresses);	// sends to client for now
 
-//echo json_encode($tracerouteOutput);
 
+/* 
+ *
+ * GEOLOCATION
+ * Takes too much time - change to call to ARIN 
+ *
+ */
+//require('geolocation.php');
 
-// was previously for the use of tracerouteimpl
-//require('tracerouteimpl.php');
-//$tracerouteResults = traceroute($ipAddress);
+//echo json_encode(retrieveLatLong($HopsIpAddresses[0]));
 
 
 ?>
