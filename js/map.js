@@ -1,48 +1,34 @@
-<script>
-// This example requires the Places library. Include the libraries=places
-// parameter when you first load the API. For example:
-// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+function initialize() {
+    var mapProp = {
+        zoom : 5,
+        mapTypeId : google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
 
-var map;
-var infowindow;
+    var geocoder = new google.maps.Geocoder();
+    var addresses = [ "Fort Wayne, Indiana", "Denver, CO", "San Fransisco, Ca" ];
+    var flightPath;
+    var myTrip = [];
 
-function initMap() {
-  var pyrmont = {lat: -33.867, lng: 151.195};
-
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: pyrmont,
-    zoom: 15
-  });
-
-  infowindow = new google.maps.InfoWindow();
-
-  var service = new google.maps.places.PlacesService(map);
-  service.nearbySearch({
-    location: pyrmont,
-    radius: 500,
-    types: ['store']
-  }, callback);
-}
-
-function callback(results, status) {
-  if (status === google.maps.places.PlacesServiceStatus.OK) {
-    for (var i = 0; i < results.length; i++) {
-      createMarker(results[i]);
+    for (var i; i < addresses.length; i++) {
+        geocoder.geocode({
+            'address' : addresses[i]
+        }, function(geocode_results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                myTrip.push({
+                    lat : geocode_results[0].geometry.location.lat(),
+                    lng : geocode_results[0].geometry.location.lng()
+                });
+                console.log(myTrip);
+                flightPath = new google.maps.Polyline({
+                    path : myTrip,
+                    strokeColor : "#0000FF",
+                    strokeWeight : 2,
+                    strokeOpacity : 0.8,
+                    map : map
+                });
+            }
+        });
     }
-  }
 }
-
-function createMarker(place) {
-  var placeLoc = place.geometry.location;
-  var marker = new google.maps.Marker({
-    map: map,
-    position: place.geometry.location
-  });
-
-  google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent(place.name);
-    infowindow.open(map, this);
-  });
-}
-
-</script>
+google.maps.event.addDomListener(window, 'load', initialize);
