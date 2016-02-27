@@ -40,7 +40,6 @@ function parseTraceroute($tracerouteOutput) {
 			array_push($hopsIpAddresses, $potentialIp);
 		}
 	}
-	//return $tracerouteOutput;
 	return $hopsIpAddresses;
 }
 
@@ -54,9 +53,9 @@ function executeTraceroute($ipAddress) {
 
 	exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute 
 
-	$HopsIpAddresses = parseTraceroute($tracerouteOutput);
+	$hopsIpAddresses = parseTraceroute($tracerouteOutput);
 
-	return $HopsIpAddresses;
+	return $hopsIpAddresses;
 }
 
 
@@ -65,20 +64,30 @@ $requestReceived = file_get_contents('php://input');
 
 $ipAddress = validateClientRequest($requestReceived);
 
-$HopsIpAddresses = executeTraceroute($ipAddress);
-
-echo json_encode($HopsIpAddresses);	// sends to client for now
+$hopsIpAddresses = executeTraceroute($ipAddress);
 
 
 /* 
- *
- * GEOLOCATION
- * Takes too much time - change to call to ARIN 
+ * 
+ * Geolocation of each IP address 
  *
  */
-//require('geolocation.php');
+require('geolocation.php');
 
-//echo json_encode(retrieveLatLong($HopsIpAddresses[0]));
+$addressPerIp = array();
 
+// TODO: verify the curl answer each time. If null, inform client side
+/* TODO: optimize the number of REST calls by looking at the range of the ip address for each: if next ip address in range of
+ * 		 the previous one, no need to call again, the information retrieved will be the same
+ * It really takes a long time to execute this code right now 
+ */
+
+foreach($hopsIpAddresses as $ipAddress) {
+	$addressPerIp[$ipAddress] = arinApiCall($ipAddress);
+}
+
+echo json_encode($addressPerIp);
+
+exit();
 
 ?>
