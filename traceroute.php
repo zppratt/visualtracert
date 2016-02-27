@@ -21,20 +21,27 @@ function validateClientRequest($request) {
  * Parses the results of traceroute and returns an array of valid ip addresses for the hops
  */
 function parseTraceroute($tracerouteOutput) {
-	$HopsIpAddresses = array();	// Array of future valid ip addresses
+	$hopsIpAddresses = array();	// Array of future valid ip addresses
 
 	for($i=1; $i<count($tracerouteOutput); $i++){	// Scouring all responses from traceroute (except the first line that we know is just descriptive)
 
+		$tracerouteOutput[$i] = str_replace("(", "", $tracerouteOutput[$i]);	// Removes the parenthesis in the output before it is exploded according to spaces
+		$tracerouteOutput[$i] = str_replace(")", "", $tracerouteOutput[$i]);
 		$exploded = explode(" ", $tracerouteOutput[$i]);
+		$hasValidIp = FALSE;
 
 		foreach($exploded as $potentialIp) {
-			if (filter_var($potentialIp, FILTER_VALIDATE_IP) == TRUE) // We have the first match of ip address in the response line
+			if (filter_var($potentialIp, FILTER_VALIDATE_IP) == TRUE) { // We have the first match of ip address in the response line
+				$hasValidIp = TRUE;
 				break;
+			}
 		}
-		array_push($HopsIpAddresses, $potentialIp);
+		if($hasValidIp == TRUE) {
+			array_push($hopsIpAddresses, $potentialIp);
+		}
 	}
-
-	return $HopsIpAddresses;
+	//return $tracerouteOutput;
+	return $hopsIpAddresses;
 }
 
 /* 
