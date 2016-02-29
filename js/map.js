@@ -6,10 +6,10 @@ function initialize() {
     var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
 
     var geocoder = new google.maps.Geocoder();
-    var addresses = [ "Fort Wayne, Indiana", "Denver, CO", "San Fransisco, Ca" ];
+    var addresses = [ "Fort Wayne, Indiana", "Denver, CO", "San Francisco, Ca" ];
     var flightPath;
     var myTrip = [];
-
+    
     for (var i; i < addresses.length; i++) {
         geocoder.geocode({
             'address' : addresses[i]

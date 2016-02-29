@@ -52,6 +52,10 @@ function executeTraceroute($ipAddress) {
 	$tracerouteOutput = array();
 
 	exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute 
+	if($returnValue != 0) {	// Error during the execution of traceroute
+		echo json_encode("Error".":"."Traceroute returned an error code");
+		exit(1);
+	}
 
 	$hopsIpAddresses = parseTraceroute($tracerouteOutput);
 
@@ -83,7 +87,14 @@ $addressPerIp = array();
  */
 
 foreach($hopsIpAddresses as $ipAddress) {
-	$addressPerIp[$ipAddress] = arinApiCall($ipAddress);
+	$temp = arinApiCall($ipAddress);
+	if($temp != NULL)
+		$addressPerIp[$ipAddress] = $temp;
+}
+
+if(empty($addressPerIp)) {
+	echo json_encode(array('Error' => 'No information could be retrieved from the given IP addresses'));
+	exit(1);
 }
 
 echo json_encode($addressPerIp);
