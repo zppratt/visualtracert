@@ -11,7 +11,7 @@ function validateClientRequest($request) {
 	$ipAddress = filter_var($ipAddress, FILTER_VALIDATE_IP);
 
 	if($ipAddress == FALSE) { // couldn't filter an ip address, therefore the format wasn't correct
-		exit(json_encode("Bad IP address format. Aborting."));
+		exit(json_encode(array('Error' => "Bad IP address format. Aborting.")));
 	}
 
 	return $ipAddress;
@@ -53,7 +53,7 @@ function executeTraceroute($ipAddress) {
 
 	exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute 
 	if($returnValue != 0) {	// Error during the execution of traceroute
-		echo json_encode("Error".":"."Traceroute returned an error code");
+		echo json_encode(array("Error" => "Traceroute returned an error code"));
 		exit(1);
 	}
 

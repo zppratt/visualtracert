@@ -1,16 +1,16 @@
 function initialize() {
     var mapProp = {
-        zoom : 5,
-        mapTypeId : google.maps.MapTypeId.ROADMAP
+        zoom: 4,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: {lat: 28.540, lng: -100.546}
     };
     var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-
     var geocoder = new google.maps.Geocoder();
     var addresses = [ "Fort Wayne, Indiana", "Denver, CO", "San Francisco, Ca" ];
     var flightPath;
     var myTrip = [];
     
-    for (var i; i < addresses.length; i++) {
+    for (var i=0; i < addresses.length; i++) {
         geocoder.geocode({
             'address' : addresses[i]
         }, function(geocode_results, status) {
@@ -31,4 +31,4 @@ function initialize() {
         });
     }
 }
-google.maps.event.addDomListener(window, 'load', initialize);
+//google.maps.event.addDomListener(window, 'load', initialize);
