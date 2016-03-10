@@ -9,20 +9,17 @@ function ValidateIPaddress(ipaddress) {
 function sendTracerouteRequest(ipaddress) {
 	var httpRequest = new XMLHttpRequest();
 		
-	httpRequest.onreadystatechange = function() {
+	httpRequest.onreadystatechange = function() { // When a response is received
 		if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+			serverResponse = JSON.parse(this.responseText);
+			console.log(serverResponse);	// printing the response in the console for debugging
 		}
-	};
-
-	// When a response is received 
-	httpRequest.onload = function() {
-		serverResponse = JSON.parse(this.responseText);
-		console.log(serverResponse);	// printing the response in the console for debugging
 	};
 		
 	httpRequest.open("POST", "traceroute.php", true);
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.send(JSON.stringify(ipaddress));
+	
     alert("Sent!");
 
 	console.log("Sent: " + JSON.stringify(ipaddress)); // Just in case for debugging, will remove later 

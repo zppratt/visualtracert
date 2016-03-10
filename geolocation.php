@@ -15,7 +15,7 @@ function restCall($url) {
 
 	$curlResponse = curl_exec($curl);
 
-	if ($curlResponse == FALSE) {	// Verifying the response of the call
+	if ($curlResponse == FALSE) {
 	    $info = curl_getinfo($curl);
 	    curl_close($curl);
 	    echo json_encode(array('Error' => 'An error occured during the REST call: ' . var_export($info)));
@@ -32,7 +32,7 @@ function restCall($url) {
  * @param $ipAddress, the IP address to request information about
  * \return an associative array containing information about the IP address, NULL on failure
  *
- * TODO: loop through array instead of individually checling every single key
+ * TODO: loop through array instead of individually checking every single key
  */
 function arinApiCall($ipAddress) {
 	$curlIPRetrieval = restCall($GLOBALS['ArinRestIp'].$ipAddress.'.json');	// Calling ARIN for info on ip address
@@ -74,29 +74,6 @@ function arinApiCall($ipAddress) {
 		$addressArray['country'] = $decodedOrg['org']['iso3166-1']['code2']['$'];
 
 	return $addressArray;
-}
-
-
-
-
-
-
-
-
-
-/* The following needs to be removed - we are not using the tracerouteimpl anymore */
-
-require('tracerouteimpl.php');
-
-/*
- * Takes an IP address and retrieves its related longitude/latitde
- */
-function retrieveLatLong($ipAddress) {
-	$data = ip2geo($ipAddress);
-	if(is_null($data)) {
-		return NULL;
-	}
-	return [$data->lattitude, $data->longitude];
 }
 
 ?>

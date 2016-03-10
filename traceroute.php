@@ -93,7 +93,7 @@ foreach($hopsIpAddresses as $ipAddress) {
 }
 
 if(empty($addressPerIp)) {
-	echo json_encode(array('Error' => 'No information could be retrieved from the given IP addresses'));
+	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));
 	exit(1);
 }
 
