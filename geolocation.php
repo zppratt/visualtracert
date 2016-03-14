@@ -11,12 +11,13 @@ $GLOBALS['ArinRestIp'] = 'http://whois.arin.net/rest/ip/';
 function restCall($url) {
 	/* REST call */
 	$curl = curl_init($url);
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE); // If successful call, value is returned by curl_exec()
 
 	$curlResponse = curl_exec($curl);
 
-	if ($curlResponse == FALSE) {
-	    $info = curl_getinfo($curl);
+	if ($curlResponse === FALSE) {
+	    //$info = curl_getinfo($curl);
+	    $info = curl_error($curl);
 	    curl_close($curl);
 	    echo json_encode(array('Error' => 'An error occured during the REST call: ' . var_export($info)));
 	    exit(1);

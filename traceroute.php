@@ -89,7 +89,7 @@ $addressPerIp = array();
 foreach($hopsIpAddresses as $ipAddress) {
 	$temp = arinApiCall($ipAddress);
 	if($temp != NULL)
-		$addressPerIp[$ipAddress] = $temp;
+		array_push($addressPerIp, $temp);
 }
 
 if(empty($addressPerIp)) {
