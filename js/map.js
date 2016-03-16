@@ -28,7 +28,7 @@ function plotOnMap(serverResponse){
     for (var i=0; i < serverResponse.length; i++) {
     	/* 
     	 * Terrible code but only temporary - for testing purposes 
-    	 * Ensures that we don't get any OVER_QUERY_LIMIT response and can actually display every point on the map
+    	 * Reduces the probability of getting an OVER_QUERY_LIMIT response and can actually display every point on the map
     	 * Some points are not displayed when too many queries - doesn't retry automatically 
     	 */
     	if(i != 0 && serverResponse[i].streetAddress == serverResponse[i-1].streetAddress && serverResponse[i].city == serverResponse[i-1].city)

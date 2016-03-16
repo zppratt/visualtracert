@@ -39,7 +39,7 @@ function arinApiCall($ipAddress) {
 	$curlIPRetrieval = restCall($GLOBALS['ArinRestIp'].$ipAddress.'.json');	// Calling ARIN for info on ip address
 	$decodedIp = json_decode($curlIPRetrieval, TRUE);
 
-	if(!array_key_exists('net', $decodedIp) && !array_key_exists('orgRef', $decodedIp['net']))
+	if(!array_key_exists('net', $decodedIp) || !array_key_exists('orgRef', $decodedIp['net']))
 		return NULL;
 	$orgContactAddress = $decodedIp['net']['orgRef']['$'];	// Retrieving url to contact for address
 

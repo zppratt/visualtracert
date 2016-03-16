@@ -13,7 +13,10 @@ function sendTracerouteRequest(ipaddress) {
 		if (httpRequest.readyState == 4 && httpRequest.status == 200) {
 			serverResponse = JSON.parse(this.responseText);
 			console.log(serverResponse);	// printing the response in the console for debugging
-			plotOnMap(serverResponse);	// Calls for plotting points on map. TODO: verify that response is free of errors before plotting
+			if(!("Error" in serverResponse))
+				plotOnMap(serverResponse);	// Calls for plotting points on map. TODO: verify that response is free of errors before plotting
+			else
+				console.log("Error detected in server's response: " + serverResponse["Error"]);
 		}
 	};
 		
