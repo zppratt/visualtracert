@@ -5,13 +5,15 @@
  */
 function validateClientRequest($request) {
 	/* Decoding the JSON object in a php array */
-	$ipAddress = json_decode($request, true);
+	$request = json_decode($request, true);
 
-	/* ipAddress is supposed to have the right format, but we check on the server side again */
+	/* Translating request (hostname, IP address, or else) into an IPV4 IP address*/
+	$ipAddress = gethostbyname($request);
+
+	/* ipAddress is supposed to have the format of an IP address. If it doesn't, it means the translation into an IP has failed (invalid hostname or else) */
 	$ipAddress = filter_var($ipAddress, FILTER_VALIDATE_IP);
-
-	if($ipAddress == FALSE) { // couldn't filter an ip address, therefore the format wasn't correct
-		exit(json_encode(array('Error' => "Bad IP address format. Aborting.")));
+	if($ipAddress == FALSE) {
+		exit(json_encode(array('Error' => "Couldn't translate the hostname into an IP address")));
 	}
 
 	return $ipAddress;
