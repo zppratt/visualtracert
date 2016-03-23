@@ -10,6 +10,8 @@ function ValidateIPaddress(ipaddress) {
 }
 
 function sendTracerouteRequest(ipaddress) {
+    $('#error').prepend('<img id="loading" src="img/ajax-loader.gif" />')
+    
 	var httpRequest = new XMLHttpRequest();
 		
 	httpRequest.onreadystatechange = function() { // When a response is received
