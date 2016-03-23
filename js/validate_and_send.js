@@ -26,8 +26,6 @@ function sendTracerouteRequest(ipaddress) {
 	httpRequest.open("POST", "traceroute.php", true);
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.send(JSON.stringify(ipaddress));
-	
-    alert("Sent!");
 
 	console.log("Sent: " + JSON.stringify(ipaddress)); // Just in case for debugging, will remove later 
 }
