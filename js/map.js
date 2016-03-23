@@ -61,4 +61,6 @@ function plotOnMap(serverResponse){
             }
         });
     }
+    // Clear the loading gif and error messages
+    $('#error').empty();
 }
