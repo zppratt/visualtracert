@@ -53,7 +53,7 @@ function executeTraceroute($ipAddress) {
 	$returnValue;
 	$tracerouteOutput = array();
 
-	exec("traceroute ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute 
+	exec("traceroute -n -q 1 -w 2 ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute 
 	if($returnValue != 0) {	// Error during the execution of traceroute
 		echo json_encode(array("Error" => "Traceroute returned an error code"));
 		exit(1);
