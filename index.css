@@ -27,3 +27,8 @@ input + p{
 #ipaddress {
 	text-align: center;
 }
+
+#error {
+	color: red;
+	font-size: .7em;
+}

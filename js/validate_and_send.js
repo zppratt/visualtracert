@@ -1,12 +1,12 @@
 function ValidateIPaddress(ipaddress) {
-    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
+    
+    if (validator.isIP(ipaddress) || validator.isURL(ipaddress)) {
+        $('#error').text("")
         return (true); // IP address matching
+    } else {
+        $('#error').text("You have entered an invalid IP address or hostname!");
+        return (false);
     }
-    else
-    	return (true); // Always returns true - Remove it? - The server side is in charge of translation into hostname
-
-    alert("You have entered an invalid IP address!");
-    return (false);
 }
 
 function sendTracerouteRequest(ipaddress) {
