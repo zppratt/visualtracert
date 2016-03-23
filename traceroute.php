@@ -72,10 +72,35 @@ $ipAddress = validateClientRequest($requestReceived);
 
 $hopsIpAddresses = executeTraceroute($ipAddress);
 
+/*
+ *
+ * Geolocation using GeoIP Database 
+ * 
+ */
+
+$addressPerIp = array();
+
+foreach($hopsIpAddresses as $ipAddress) {
+	$temp = geoip_record_by_name($ipAddress);
+	if($temp != FALSE)
+		array_push($addressPerIp, $temp);
+}
+
+if(empty($addressPerIp)) {
+	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));
+	exit(1);
+}
+
+echo json_encode($addressPerIp);
+
+exit();
+
 
 /* 
  * 
  * Geolocation of each IP address 
+ *
+ * TO BE DELETED WHEN WE AGREE ON WHAT IS DONE
  *
  */
 require('geolocation.php');
