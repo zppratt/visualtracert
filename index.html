@@ -27,6 +27,13 @@
             if (ValidateIPaddress(ipaddress) == true)
                 sendTracerouteRequest(ipaddress);
         });
+        $("#ipaddress").keyup(function (e) {
+            if (e.keyCode == 13) {
+                ipaddress = $('#ipaddress').val();
+                if (ValidateIPaddress(ipaddress) == true)
+                    sendTracerouteRequest(ipaddress);
+            }
+        });
     });
 </script>
 </head>
