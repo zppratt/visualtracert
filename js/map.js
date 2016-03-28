@@ -11,11 +11,45 @@ function initialize() {
     var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
 }
 
+
+/* 
+    Plots polylines on map 
+    TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
+*/
+function plotOnMap(serverResponse){
+    var mapProp = {
+        zoom: 4,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: {lat: 28.540, lng: -100.546}
+    };
+    var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+    var myTrip = [];
+
+    for (var i=0; i < serverResponse.length; i++) {
+       
+        myTrip.push({
+            lat : serverResponse[i].latitude,
+            lng : serverResponse[i].longitude,
+        });
+        console.log(myTrip);
+        flightPath = new google.maps.Polyline({
+            path : myTrip,
+            strokeColor : "#FF0000",
+            strokeWeight : 2,
+            strokeOpacity : 0.8,
+            map : map
+        });
+    }
+    // Clear the loading gif and error messages
+    $('#error').empty();
+}
+
+
 /* 
 	Plots polylines on map 
 	TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
 */
-function plotOnMap(serverResponse){
+function plotOnMapPrevious(serverResponse){
 	var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
