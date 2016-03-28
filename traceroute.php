@@ -1,5 +1,9 @@
 <?php
 
+/* Global variables */
+$GLOBALS['Database'] = 0;
+$GLOBALS['Warning'] = '';
+
 /* 
  * Ensures that the IP sent by the client is in the correct format and returns the ip address extracted
  */
@@ -8,13 +12,20 @@ function validateClientRequest($request) {
 	$request = json_decode($request, true);
 
 	/* Translating request (hostname, IP address, or else) into an IPV4 IP address*/
-	$ipAddress = gethostbyname($request);
+	$ipAddress = gethostbyname($request['ip']);
 
 	/* ipAddress is supposed to have the format of an IP address. If it doesn't, it means the translation into an IP has failed (invalid hostname or else) */
 	$ipAddress = filter_var($ipAddress, FILTER_VALIDATE_IP);
 	if($ipAddress == FALSE) {
 		exit(json_encode(array('Error' => "Couldn't translate the hostname into an IP address")));
 	}
+
+	/* Retrieving the selected database to use */
+	if($request['database'] != 0 && $request['database'] != 1) {
+		$GLOBALS['Warning'] .= "Invalid database selected, using GeoLite instead".'<br/>';
+	}
+	else
+		$GLOBALS['Database'] = $request['database'];
 
 	return $ipAddress;
 }
@@ -74,19 +85,14 @@ $hopsIpAddresses = executeTraceroute($ipAddress);
 
 /*
  *
- * Geolocation using GeoIP Database 
+ * Geolocation
  * 
  */
 
-$addressPerIp = array();
+require('geolocation.php');
 
-foreach($hopsIpAddresses as $ipAddress) {
-	$temp = geoip_record_by_name($ipAddress);
-	if($temp != FALSE) {
-		$temp['IP'] = $ipAddress;
-		array_push($addressPerIp, $temp);
-	}
-}
+$addressPerIp = geolocation($hopsIpAddresses);
+
 
 if(empty($addressPerIp)) {
 	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));

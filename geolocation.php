@@ -69,12 +69,40 @@ function arinApiCall($ipAddress) {
 	}
 
 	if(array_key_exists('iso3166-2', $decodedOrg['org']))
-		$addressArray['state'] = $decodedOrg['org']['iso3166-2']['$'];
+		$addressArray['region'] = $decodedOrg['org']['iso3166-2']['$'];
 
 	if(array_key_exists('iso3166-1', $decodedOrg['org']) and array_key_exists('code2', $decodedOrg['org']['iso3166-1']))
-		$addressArray['country'] = $decodedOrg['org']['iso3166-1']['code2']['$'];
+		$addressArray['country_code'] = $decodedOrg['org']['iso3166-1']['code2']['$'];
+	$addressArray['latitude'] = NULL;
+	$addressArray['longitude'] = NULL;
 
 	return $addressArray;
+}
+
+function geolocation($hopsIpAddresses) {
+	$addressPerIp = array();
+
+	if($GLOBALS['Database'] == 0){
+		foreach($hopsIpAddresses as $ipAddress) {
+			$temp = geoip_record_by_name($ipAddress);
+			if($temp != FALSE) {
+				$temp['IP'] = $ipAddress;
+				array_push($addressPerIp, $temp);
+			}
+		}
+	}
+
+	else if($GLOBALS['Database'] == 1) {
+		foreach($hopsIpAddresses as $ipAddress) {
+			$temp = arinApiCall($ipAddress);
+			if($temp != NULL) {
+				$temp['IP'] = $ipAddress;
+				array_push($addressPerIp, $temp);
+			}
+		}
+	}
+
+	return $addressPerIp;
 }
 
 ?>

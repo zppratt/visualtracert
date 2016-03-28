@@ -23,9 +23,16 @@ function sendTracerouteRequest(ipaddress) {
 		}
 	};
 		
+	// Selecting database method
+	var selectedDB;
+	if($('#dbGeoLite').prop("checked"))
+		selectedDB = 0;
+	else
+		selectedDB = 1;
+
 	httpRequest.open("POST", "traceroute.php", true);
 	httpRequest.setRequestHeader("Content-type", "application/json");
-	httpRequest.send(JSON.stringify(ipaddress));
+	httpRequest.send(JSON.stringify({ip:ipaddress, database:selectedDB}));
 
 	console.log("Sent: " + JSON.stringify(ipaddress)); // Just in case for debugging, will remove later 
 }
