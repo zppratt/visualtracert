@@ -40,18 +40,27 @@
 
 <body>
 	<div id="Traceroute">
-		<img src="icon.png" alt="icon" />
-		<h2>BaconFiesta Visual Traceroute</h2>
-		<p>Enter the IP address you want to trace the route to below:</p>
-		<p>
-			<input id="ipaddress" name="ipaddress" placeholder="e.g. google.com"
-				required></input>
-		</p>
-		<div id="error"></div>
-		<p>
-			<button type="button" id="button">Traceroute!</button>
-		</p>
+		<div id="leftPanel">
+			<div id="tracerouteOutput"></div>
+
+			<div id="tracerouteInput">
+				<img src="icon.png" alt="icon" />
+				<h2>BaconFiesta Visual Traceroute</h2>
+				<p>Enter the IP address you want to trace the route to below:</p>
+				<p>
+					<input id="ipaddress" name="ipaddress" placeholder="e.g. google.com"
+						required></input>
+				</p>
+				<div id="error"></div>
+				<p>
+					<button type="button" id="button">Traceroute!</button>
+				</p>
+			</div>
+		</div>
+
+		<div id="tracerouteWarnings"></div>
 	</div>
+
 	<div id="googleMap" style="width: 100%; height: 100%;"></div>
 </body>
 

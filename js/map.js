@@ -46,10 +46,10 @@ function plotOnMap(serverResponse){
 
 
 /* 
-	Plots polylines on map 
+	Maps plotting with geocoding - to be reused when not enough data on server response (no lat/long)
 	TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
 */
-function plotOnMapPrevious(serverResponse){
+function plotOnMapGeocode(serverResponse){
 	var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,

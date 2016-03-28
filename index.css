@@ -1,8 +1,6 @@
 
 /*
  * index.css
- * Visual Traceroute Project
- * TeamBaconFiesta <TeamBaconFiesta@gmail.com>
  * 
  * CSS page of the index.html page 
  * */
@@ -16,7 +14,37 @@ html, body {
 
 #Traceroute {
 	text-align: center;
+	width: 100%;
 }
+
+div h3 {
+	text-align: center;
+}
+
+#leftPanel {
+	float: left;
+	margin: 0;
+	width: 66.6%;
+}
+
+#tracerouteOutput {
+	float: left;
+	margin: 0;
+	width: 50%;
+	text-align: left;
+}
+
+#tracerouteInput {
+	margin-left: 50%;
+	width: 50%;
+}
+
+#tracerouteWarnings {
+	margin: 0% 0%;
+	margin-left: 66.6%;
+	width: 33.3%;
+}
+
 
 
 /* Elements p located right after input tags */

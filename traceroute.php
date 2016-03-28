@@ -82,8 +82,10 @@ $addressPerIp = array();
 
 foreach($hopsIpAddresses as $ipAddress) {
 	$temp = geoip_record_by_name($ipAddress);
-	if($temp != FALSE)
+	if($temp != FALSE) {
+		$temp['IP'] = $ipAddress;
 		array_push($addressPerIp, $temp);
+	}
 }
 
 if(empty($addressPerIp)) {
