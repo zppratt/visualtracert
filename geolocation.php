@@ -55,17 +55,17 @@ function arinApiCall($ipAddress) {
 		$addressArray['city'] = $decodedOrg['org']['city']['$'];
 
 	if(array_key_exists('postalCode', $decodedOrg['org']))
-		$addressArray['postalCode'] = $decodedOrg['org']['postalCode']['$'];
+		$addressArray['postal_code'] = $decodedOrg['org']['postalCode']['$'];
 
 	if(array_key_exists('streetAddress', $decodedOrg['org']) && array_key_exists('line', $decodedOrg['org']['streetAddress'])) {
 		$i = 0;
-		$addressArray['streetAddress'] = "";
+		$addressArray['street_address'] = "";
 		while(array_key_exists(strval($i), $decodedOrg['org']['streetAddress']['line'])) {
-			$addressArray['streetAddress'] .= $decodedOrg['org']['streetAddress']['line'][strval($i)]['$']." ";
+			$addressArray['street_address'] .= $decodedOrg['org']['streetAddress']['line'][strval($i)]['$']." ";
 			$i += 1;
 		}
 		if(array_key_exists('$', $decodedOrg['org']['streetAddress']['line']))
-			$addressArray['streetAddress'] .= $decodedOrg['org']['streetAddress']['line']['$']." ";
+			$addressArray['street_address'] .= $decodedOrg['org']['streetAddress']['line']['$']." ";
 	}
 
 	if(array_key_exists('iso3166-2', $decodedOrg['org']))

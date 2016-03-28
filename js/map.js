@@ -12,11 +12,21 @@ function initialize() {
 }
 
 
+
+function plotOnMap(serverResponse) {
+    if(serverResponse.length == 0)
+        return;
+    if(serverResponse[0].latitude == null) // Arin specific answer
+        plotOnMapArin(serverResponse);
+    else
+        plotOnMapGeoLite(serverResponse);
+    // Clear the loading gif and error messages
+    $('#error').empty();
+}
 /* 
-    Plots polylines on map 
-    TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
+    Plots polylines on map for GeoLite specific answer
 */
-function plotOnMap(serverResponse){
+function plotOnMapGeoLite(serverResponse){
     var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -40,8 +50,6 @@ function plotOnMap(serverResponse){
             map : map
         });
     }
-    // Clear the loading gif and error messages
-    $('#error').empty();
 }
 
 
@@ -49,7 +57,7 @@ function plotOnMap(serverResponse){
 	Maps plotting with geocoding - to be reused when not enough data on server response (no lat/long)
 	TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
 */
-function plotOnMapGeocode(serverResponse){
+function plotOnMapArin(serverResponse){
 	var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -65,7 +73,7 @@ function plotOnMapGeocode(serverResponse){
     	 * Reduces the probability of getting an OVER_QUERY_LIMIT response and can actually display every point on the map
     	 * Some points are not displayed when too many queries - doesn't retry automatically 
     	 */
-    	if(i != 0 && serverResponse[i].streetAddress == serverResponse[i-1].streetAddress && serverResponse[i].city == serverResponse[i-1].city)
+    	if(i != 0 && serverResponse[i].city == serverResponse[i-1].city)
     		continue;
 
     	/*
@@ -95,6 +103,4 @@ function plotOnMapGeocode(serverResponse){
             }
         });
     }
-    // Clear the loading gif and error messages
-    $('#error').empty();
 }
