@@ -1,5 +1,8 @@
 <?php
 
+/* Disable error reporting of "notice" errors returned by geoip when a record is not found in the database */
+error_reporting(E_ALL & ~E_NOTICE);
+
 $GLOBALS['ArinRestIp'] = 'http://whois.arin.net/rest/ip/';
 
 /*

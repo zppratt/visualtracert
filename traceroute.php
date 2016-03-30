@@ -89,6 +89,7 @@ $hopsIpAddresses = executeTraceroute($ipAddress);
  * 
  */
 
+error_reporting(E_ALL & ~E_NOTICE);
 require('geolocation.php');
 
 $addressPerIp = geolocation($hopsIpAddresses);
