@@ -47,6 +47,8 @@ function processResponse(serverResponse) {
 		}
 		plotOnMap(serverResponse);	// Calls for plotting points on map. TODO: verify that response is free of errors before plotting
 	}
-	else
+	else {
+		$('#error').text(serverResponse["Error"]);
 		console.log("Error detected in server's response: " + serverResponse["Error"]);
+	}
 }
