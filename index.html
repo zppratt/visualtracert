@@ -31,7 +31,7 @@
             if (e.keyCode == 13) {
                 ipaddress = $('#ipaddress').val();
                 if (ValidateIPaddress(ipaddress) == true)
-                    sendTracerouteRequest(ipaddress);
+                    sendTracerouteRequest(ipaddress, 1);
             }
         });
     });

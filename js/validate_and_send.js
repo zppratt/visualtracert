@@ -10,7 +10,7 @@ function ValidateIPaddress(ipaddress) {
     }
 }
 
-function sendTracerouteRequest(ipaddress) {
+function sendTracerouteRequest(ipaddress, TTL) {
     $('#error').prepend('<img id="loading" src="img/ajax-loader.gif" />')
     
 	var httpRequest = new XMLHttpRequest();
@@ -19,7 +19,7 @@ function sendTracerouteRequest(ipaddress) {
 		if (httpRequest.readyState == 4 && httpRequest.status == 200) {
 			serverResponse = JSON.parse(this.responseText);
 			console.log(serverResponse);	// printing the response in the console for debugging
-			processResponse(serverResponse);
+			processResponse(serverResponse, TTL);
 		}
 	};
 		
@@ -32,12 +32,14 @@ function sendTracerouteRequest(ipaddress) {
 
 	httpRequest.open("POST", "traceroute.php", true);
 	httpRequest.setRequestHeader("Content-type", "application/json");
-	httpRequest.send(JSON.stringify({ip:ipaddress, database:selectedDB}));
+	httpRequest.send(JSON.stringify({ip:ipaddress, database:selectedDB, TTL:TTL}));
 
 	console.log("Sent: " + JSON.stringify(ipaddress)); // Just in case for debugging, will remove later 
 }
 
-function processResponse(serverResponse) {
+function processResponse(serverResponse, TTL) {
+	if("MoreHops" in serverResponse)
+		sendTracerouteRequest(ipaddress, TTL+1);
 	if(!("Error" in serverResponse)) {
 		$('#tracerouteOutput').html('<table><tr><th>#</th><th>IP</th><th>Location</th></tr></table>');
 		for (var i=0; i < serverResponse.length; i++) {

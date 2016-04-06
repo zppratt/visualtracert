@@ -1,8 +1,15 @@
 <?php
 
+/* Session 
+ * 
+ * Memorizes some data*/
+session_start();
+
 /* Global variables */
 $GLOBALS['Database'] = 0;
 $GLOBALS['Warning'] = '';
+$GLOBALS['TTL'] = 1;
+
 
 /* 
  * Ensures that the IP sent by the client is in the correct format and returns the ip address extracted
@@ -26,6 +33,17 @@ function validateClientRequest($request) {
 	}
 	else
 		$GLOBALS['Database'] = $request['database'];
+
+	if($request['TTL'] < 1 || $request['TTL'] > 64) {
+		$GLOBALS['Warning'] .= "Invalid TTL value, set to 1 instead".'<br/>';
+	}
+	else {
+		$GLOBALS['TTL'] = $request['TTL'];
+		if($request['TTL'] == 1) {
+			session_destroy();
+			session_start();
+		}
+	}
 
 	return $ipAddress;
 }
@@ -52,13 +70,29 @@ function parseTraceroute($tracerouteOutput) {
 	return NULL;	// Return NULL if no IP addresses returned by traceroute
 }
 
+
+/* 
+ * Execute the 1 traceroute call to find 1 hop located at $TTL hops and return its IP address, or NULL if not found
+ */
+function traceroute1Hop($ipAddress, $TTL) {
+	$returnValue;
+	$tracerouteOutput = NULL;
+	exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue);
+
+	if($returnValue != 0) {	// Error during the execution of traceroute
+		echo json_encode(array("Error" => "Traceroute returned an error code "));
+		exit(1);
+	}
+
+	return(parseTraceroute($tracerouteOutput)); // Returns the IP address of the hop found, or NULL if nothing found
+}
+
 /* 
  * Execute the traceroute call and returns the IP addresses of the hops
  * TODO: make sure exec() finishes its execution and take care of the timeout
  */
 function executeTraceroute($ipAddress) {
 	$returnValue;
-	$hopFound = NULL;
 	$tracerouteArray = array();
 	array_push($tracerouteArray, gethostbyname(gethostname()));	// initialize tracerouteArray with the server's IP address to display first
 	$TTL = 1;
@@ -67,15 +101,9 @@ function executeTraceroute($ipAddress) {
 	do {
 		$tracerouteOutput = NULL;
 		$hopFound = NULL;
-		exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute for 1 hop only
-		if($returnValue != 0) {	// Error during the execution of traceroute
-			echo json_encode(array("Error" => "Traceroute returned an error code ".$TTL." ".$hopFound));
-			exit(1);
-		}
-
-		$hopFound = parseTraceroute($tracerouteOutput); // Returns the IP address of the hop found, or NULL if nothing found
+		
+		$hopFound = traceroute1Hop($ipAddress, $TTL); // Returns the IP address of the hop found, or NULL if nothing found
 		$TTL += 1;
-
 
 		if($hopFound == NULL) {
 			$hopNotFoundNb += 1;
@@ -99,7 +127,14 @@ $requestReceived = file_get_contents('php://input');
 
 $ipAddress = validateClientRequest($requestReceived);
 
-$hopsIpAddresses = executeTraceroute($ipAddress);
+//$nextHop = executeTraceroute($ipAddress);
+$nextHop = array(traceroute1Hop($ipAddress, $GLOBALS['TTL']));
+
+if(!isset($_SESSION['LastHop'])  || isset($_SESSION['LastHop']) && $_SESSION['LastHop'] != $nextHop[0]) { // TODO: take care of case where $nextHop is NULL
+	$moreHops = TRUE;
+	$_SESSION['LastHop'] = $nextHop[0];
+}
+
 
 /*
  *
@@ -109,7 +144,7 @@ $hopsIpAddresses = executeTraceroute($ipAddress);
 
 require('geolocation.php');
 
-$addressPerIp = geolocation($hopsIpAddresses);
+$addressPerIp = geolocation($nextHop);
 
 
 if(empty($addressPerIp)) {
@@ -117,10 +152,13 @@ if(empty($addressPerIp)) {
 	exit(1);
 }
 
+if($moreHops == TRUE) { 
+	$addressPerIp["MoreHops"]=True;
+}
+
 echo json_encode($addressPerIp);
 
 exit();
-
 
 /* 
  * 
@@ -129,7 +167,7 @@ exit();
  * TO BE DELETED WHEN WE AGREE ON WHAT IS DONE
  *
  */
-require('geolocation.php');
+require_once('geolocation.php');
 
 $addressPerIp = array();
 
@@ -139,7 +177,7 @@ $addressPerIp = array();
  * It really takes a long time to execute this code right now 
  */
 
-foreach($hopsIpAddresses as $ipAddress) {
+foreach($nextHop as $ipAddress) {
 	$temp = arinApiCall($ipAddress);
 	if($temp != NULL)
 		array_push($addressPerIp, $temp);
