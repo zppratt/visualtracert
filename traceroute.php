@@ -31,10 +31,10 @@ function validateClientRequest($request) {
 }
 
 /* 
- * Parses the results of traceroute and returns an array of valid ip addresses for the hops
+ * Parses the results of traceroute and returns the first valid IP address found
+ * Returns NULL if no IP addresses found
  */
 function parseTraceroute($tracerouteOutput) {
-	$hopsIpAddresses = array();	// Array of future valid ip addresses
 
 	for($i=1; $i<count($tracerouteOutput); $i++){	// Scouring all responses from traceroute (except the first line that we know is just descriptive)
 
@@ -45,15 +45,11 @@ function parseTraceroute($tracerouteOutput) {
 
 		foreach($exploded as $potentialIp) {
 			if (filter_var($potentialIp, FILTER_VALIDATE_IP) == TRUE) { // We have the first match of ip address in the response line
-				$hasValidIp = TRUE;
-				break;
+				return $potentialIp;	// Return very first IP address encountered because we're considering only 1 hop at a time
 			}
 		}
-		if($hasValidIp == TRUE) {
-			array_push($hopsIpAddresses, $potentialIp);
-		}
 	}
-	return $hopsIpAddresses;
+	return NULL;	// Return NULL if no IP addresses returned by traceroute
 }
 
 /* 
@@ -62,17 +58,39 @@ function parseTraceroute($tracerouteOutput) {
  */
 function executeTraceroute($ipAddress) {
 	$returnValue;
-	$tracerouteOutput = array();
+	$hopFound = NULL;
+	$tracerouteArray = array();
+	array_push($tracerouteArray, gethostbyname(gethostname()));	// initialize tracerouteArray with the server's IP address to display first
+	$TTL = 1;
+	$hopNotFoundNb = 0;
 
-	exec("traceroute -n -q 1 -w 2 ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute 
-	if($returnValue != 0) {	// Error during the execution of traceroute
-		echo json_encode(array("Error" => "Traceroute returned an error code"));
-		exit(1);
-	}
+	do {
+		$tracerouteOutput = NULL;
+		$hopFound = NULL;
+		exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue); // execute the traceroute for 1 hop only
+		if($returnValue != 0) {	// Error during the execution of traceroute
+			echo json_encode(array("Error" => "Traceroute returned an error code ".$TTL." ".$hopFound));
+			exit(1);
+		}
 
-	$hopsIpAddresses = parseTraceroute($tracerouteOutput);
+		$hopFound = parseTraceroute($tracerouteOutput); // Returns the IP address of the hop found, or NULL if nothing found
+		$TTL += 1;
 
-	return $hopsIpAddresses;
+
+		if($hopFound == NULL) {
+			$hopNotFoundNb += 1;
+			continue;
+		}
+
+		if($hopFound != $tracerouteArray[count($tracerouteArray)-1]) // Assuming gethostname() differs from first hop encountered!! /!\ (which is the case for now because we are localhost)
+			array_push($tracerouteArray, $hopFound);
+		else
+			break;	// Stop traceroute after 2 same hops have been found for 2 different TTL values (means destination reached)
+
+	} while($hopNotFoundNb <= 3);	// Stop after 3 hops not found (hopefully means that distant host unreachable)
+									// Might consider modifying so that counts only consecutive not found hops
+
+	return $tracerouteArray;
 }
 
 
@@ -89,7 +107,6 @@ $hopsIpAddresses = executeTraceroute($ipAddress);
  * 
  */
 
-error_reporting(E_ALL & ~E_NOTICE);
 require('geolocation.php');
 
 $addressPerIp = geolocation($hopsIpAddresses);
