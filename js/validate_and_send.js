@@ -34,7 +34,7 @@ function sendTracerouteRequest(ipaddress, TTL) {
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.send(JSON.stringify({ip:ipaddress, database:selectedDB, TTL:TTL}));
 
-	console.log("Sent: " + JSON.stringify(ipaddress)); // Just in case for debugging, will remove later 
+	console.log("Sent: " + JSON.stringify({ip:ipaddress, database:selectedDB, TTL:TTL})); // Just in case for debugging, will remove later 
 }
 
 function processResponse(serverResponse, TTL) {

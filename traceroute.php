@@ -156,6 +156,7 @@ if(empty($resultsArray['Data'])) {
 if($moreHops == TRUE) { 
 	$resultsArray["MoreHops"]=True;
 }
+$resultsArray["TTL"]=$GLOBALS['TTL'];
 
 echo json_encode($resultsArray);
 
