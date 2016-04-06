@@ -129,6 +129,8 @@ $ipAddress = validateClientRequest($requestReceived);
 
 //$nextHop = executeTraceroute($ipAddress);
 $nextHop = array(traceroute1Hop($ipAddress, $GLOBALS['TTL']));
+if($nextHop[0] == NULL)
+	$GLOBALS['Warning'] .= "Couldn't be resolved".'<br/>';
 
 if(!isset($_SESSION['LastHop'])  || isset($_SESSION['LastHop']) && $_SESSION['LastHop'] != $nextHop[0]) { // TODO: take care of case where $nextHop is NULL
 	$moreHops = TRUE;
@@ -146,7 +148,8 @@ require('geolocation.php');
 
 $resultsArray = Array();
 
-$resultsArray['Data'] = geolocation($nextHop);
+if($nextHop[0] != NULL)
+	$resultsArray['Data'] = geolocation($nextHop);
 
 if(empty($resultsArray['Data'])) {
 	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));
@@ -156,7 +159,7 @@ if(empty($resultsArray['Data'])) {
 if($moreHops == TRUE) { 
 	$resultsArray["MoreHops"]=True;
 }
-$resultsArray["TTL"]=$GLOBALS['TTL'];
+$resultsArray['Warning']=$GLOBALS['Warning'];
 
 echo json_encode($resultsArray);
 

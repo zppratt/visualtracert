@@ -24,8 +24,11 @@
     $(document).ready(function() {
         $('#button').click(function() {
             ipaddress = $('#ipaddress').val();
-            if (ValidateIPaddress(ipaddress) == true)
+            if (ValidateIPaddress(ipaddress) == true) {
+            	traceroute = [];
+            	$('#error').prepend('<img id="loading" src="img/ajax-loader.gif" />');
                 sendTracerouteRequest(ipaddress, 1);
+            }
         });
         $("#ipaddress").keyup(function (e) {
             if (e.keyCode == 13) {
