@@ -1,5 +1,10 @@
 
 /*
+ * Global Variables
+ */
+var traceroute = [];
+
+/*
  * Initializes a blank map (nothing drawn on it) in the HTML page 
  */
 function initialize() {

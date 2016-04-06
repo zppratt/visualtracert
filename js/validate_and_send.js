@@ -41,13 +41,15 @@ function processResponse(serverResponse, TTL) {
 	if("MoreHops" in serverResponse)
 		sendTracerouteRequest(ipaddress, TTL+1);
 	if(!("Error" in serverResponse)) {
+		data = serverResponse['Data'];
+		traceroute.push(data[0]);
 		$('#tracerouteOutput').html('<table><tr><th>#</th><th>IP</th><th>Location</th></tr></table>');
-		for (var i=0; i < serverResponse.length; i++) {
+		for (var i=0; i < traceroute.length; i++) {
 			$('#tracerouteOutput table').html($('#tracerouteOutput table').html() + '<tr>' 
-				+ '<td>' + i + '</td><td>' + serverResponse[i].IP + '</td><td>' + serverResponse[i].city + ' ' 
-				+ serverResponse[i].region + ' ' + serverResponse[i].country_code +'</td></tr>');
+				+ '<td>' + i + '</td><td>' + traceroute[i].IP + '</td><td>' + traceroute[i].city + ' ' 
+				+ traceroute[i].region + ' ' + traceroute[i].country_code +'</td></tr>');
 		}
-		plotOnMap(serverResponse);	// Calls for plotting points on map. TODO: verify that response is free of errors before plotting
+		plotOnMap(traceroute);	// Calls for plotting points on map. TODO: verify that response is free of errors before plotting
 	}
 	else {
 		$('#error').text(serverResponse["Error"]);

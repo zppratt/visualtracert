@@ -144,19 +144,20 @@ if(!isset($_SESSION['LastHop'])  || isset($_SESSION['LastHop']) && $_SESSION['La
 
 require('geolocation.php');
 
-$addressPerIp = geolocation($nextHop);
+$resultsArray = Array();
 
+$resultsArray['Data'] = geolocation($nextHop);
 
-if(empty($addressPerIp)) {
+if(empty($resultsArray['Data'])) {
 	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));
 	exit(1);
 }
 
 if($moreHops == TRUE) { 
-	$addressPerIp["MoreHops"]=True;
+	$resultsArray["MoreHops"]=True;
 }
 
-echo json_encode($addressPerIp);
+echo json_encode($resultsArray);
 
 exit();
 
