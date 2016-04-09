@@ -13,7 +13,31 @@ function initialize() {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         center: {lat: 28.540, lng: -100.546}
     };
-    var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+    $.get("http://ipinfo.io", function(response) {
+        console.log(response);
+        var currentLocation = response.city + ", " + response.region
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({
+            'address' : currentLocation
+            }, function(geocode_results, status) {
+                if (status != google.maps.GeocoderStatus.OK) {
+                    console.log(status);
+                }
+                else if (status == google.maps.GeocoderStatus.OK) {
+                    console.log(geocode_results[0].geometry.location.lat());
+                    console.log(geocode_results[0].geometry.location.lng());
+                    var mapProp = {
+                        zoom: 6,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        center: {
+                            lat: geocode_results[0].geometry.location.lat(),
+                            lng: geocode_results[0].geometry.location.lng()
+                        }
+                    };
+                }
+                var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+        });
+    }, "jsonp");
 }
 
 

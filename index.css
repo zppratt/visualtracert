@@ -45,7 +45,10 @@ div h3 {
 	width: 33.3%;
 }
 
-
+#googleMap {
+	width: 100%;
+	height: 40em;
+}
 
 /* Elements p located right after input tags */
 input + p{
