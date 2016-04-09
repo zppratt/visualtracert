@@ -43,15 +43,19 @@ function processResponse(serverResponse, TTL) {
 	}
 	else if("MoreHops" in serverResponse) {
 		sendTracerouteRequest(ipaddress, TTL+1);
-		traceroute.push(serverResponse['Data']);
-		updateIPArray(traceroute);
+		if(serverResponse['Found']==true) {
+			traceroute.push(serverResponse['Data']);
+			updateIPArray(traceroute);
+		}
 		if("Warning" in serverResponse && serverResponse['Warning'] != '')
 			updateWarnings(serverResponse['Warning'], traceroute.length);
 	}
 	else {
-		traceroute.push(serverResponse['Data']);
-		updateIPArray(traceroute);		
-		plotOnMap(traceroute);	// Calls for plotting points on map
+		if(serverResponse['Found']==true) {
+			traceroute.push(serverResponse['Data']);
+			updateIPArray(traceroute);
+		}	
+		plotOnMap(traceroute);	// Calls for plotting points on map after all data has been received (How to plot when still receiving data?)
 	}
 
 }
@@ -60,14 +64,14 @@ function updateIPArray(traceroute) {
 	$('#tracerouteOutput').html('<table><tr><th>#</th><th>IP</th><th>Location</th></tr></table>');
 	for (var i=0; i < traceroute.length; i++) {
 		$('#tracerouteOutput table').html($('#tracerouteOutput table').html() + '<tr>' 
-			+ '<td>' + i+1 + '</td><td>' + traceroute[i].IP + '</td><td>' + traceroute[i].city + ' ' 
+			+ '<td>' + (i+1) + '</td><td>' + traceroute[i].IP + '</td><td>' + traceroute[i].city + ' ' 
 			+ traceroute[i].region + ' ' + traceroute[i].country_code +'</td></tr>');
 	}
 }
 
 function updateWarnings(warning, warningNb) {
 	if($('#tracerouteWarnings table')[0] == null) { // Table not created yet
-		$('#tracerouteWarnings').html('<table><tr><th>#</th><th>Warning</th></tr></table>');
+		$('#tracerouteWarnings').html('<table><tr><th>#</th><th>Warnings</th></tr></table>');
 	}
 	$('#tracerouteWarnings table').append("<tr><td>"+warningNb+"</td><td>"+warning+"</td></tr>");
 }

@@ -16,22 +16,29 @@ function validateClientRequest($request) {
 		exit(json_encode(array('Error' => "Couldn't translate the hostname into an IP address")));
 	}
 
+	/* When a request for a new IP is sent, reset the globals*/
+	if($request['TTL'] == 1) {
+		session_destroy();
+		session_start();
+		$GLOBALS['TTL'] = 1;
+		$_SESSION['AttemptsNb'] = 0;
+		$GLOBALS['Warning'] = '';
+	}
+
 	/* Retrieving the selected database to use */
 	if($request['database'] != 0 && $request['database'] != 1) {
-		$GLOBALS['Warning'] .= "Invalid database selected, using GeoLite instead\n";
+		$GLOBALS['Warning'] .= "Invalid database selected, using GeoLite instead. \n";
 	}
 	else
 		$GLOBALS['Database'] = $request['database'];
 
+	/* Setting the TTL */
 	if($request['TTL'] < 1 || $request['TTL'] > 64) {
 		$GLOBALS['Warning'] .= "Invalid TTL value, set to 1 instead\n";
+		$GLOBALS['TTL'] = 1;
 	}
 	else {
 		$GLOBALS['TTL'] = $request['TTL'];
-		if($request['TTL'] == 1) {
-			session_destroy();
-			session_start();
-		}
 	}
 
 	return $ipAddress;
