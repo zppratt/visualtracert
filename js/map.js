@@ -1,11 +1,11 @@
 
-/*
- * Global Variables
+/**
+ * Global variables
  */
 var traceroute = [];
 
-/*
- * Initializes a blank map (nothing drawn on it) in the HTML page 
+/**
+ * Initializes a blank map (nothing drawn on it) in the HTML page.
  */
 function initialize() {
     var mapProp = {
@@ -14,7 +14,6 @@ function initialize() {
         center: {lat: 28.540, lng: -100.546}
     };
     $.get("http://ipinfo.io", function(response) {
-        console.log(response);
         var currentLocation = response.city + ", " + response.region
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({
@@ -24,8 +23,6 @@ function initialize() {
                     console.log(status);
                 }
                 else if (status == google.maps.GeocoderStatus.OK) {
-                    console.log(geocode_results[0].geometry.location.lat());
-                    console.log(geocode_results[0].geometry.location.lng());
                     var mapProp = {
                         zoom: 6,
                         mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -40,21 +37,25 @@ function initialize() {
     }, "jsonp");
 }
 
-
-
+/**
+ * Plots the points on the map using either method.
+ * @param serverResponse
+ */
 function plotOnMap(serverResponse) {
-    if(serverResponse.length == 0)
+    if (serverResponse.length == 0)
         return;
-    if(serverResponse[0].latitude == null) // Arin specific answer
+    if (serverResponse[0].latitude == null) // Arin specific answer
         plotOnMapArin(serverResponse);
     else
         plotOnMapGeoLite(serverResponse);
     // Clear the loading gif and error messages
     $('#error').empty();
 }
-/* 
-    Plots polylines on map for GeoLite specific answer
-*/
+
+/**
+ * Plots polylines on map for GeoLite specific answer
+ * @param serverResponse
+ */
 function plotOnMapGeoLite(serverResponse){
     var mapProp = {
         zoom: 4,
@@ -81,11 +82,11 @@ function plotOnMapGeoLite(serverResponse){
     }
 }
 
-
-/* 
-	Maps plotting with geocoding - to be reused when not enough data on server response (no lat/long)
-	TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
-*/
+/**
+ * Maps plotting with geocoding - to be reused when not enough data on server response (no lat/long)
+ * TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
+ * @param serverResponse
+ */
 function plotOnMapArin(serverResponse){
 	var mapProp = {
         zoom: 4,
@@ -102,7 +103,7 @@ function plotOnMapArin(serverResponse){
     	 * Reduces the probability of getting an OVER_QUERY_LIMIT response and can actually display every point on the map
     	 * Some points are not displayed when too many queries - doesn't retry automatically 
     	 */
-    	if(i != 0 && serverResponse[i].city == serverResponse[i-1].city)
+    	if (i != 0 && serverResponse[i].city == serverResponse[i-1].city)
     		continue;
 
     	/*
@@ -121,7 +122,6 @@ function plotOnMapArin(serverResponse){
                     lat : geocode_results[0].geometry.location.lat(),
                     lng : geocode_results[0].geometry.location.lng()
                 });
-                console.log(myTrip);
                 flightPath = new google.maps.Polyline({
                     path : myTrip,
                     strokeColor : "#FF0000",

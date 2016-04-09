@@ -1,12 +1,12 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
 ### What is this repository for? ###
 
 * Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+A basic client-server visual traceroute that uses either of two different methods to transcode ip addresses to latitude
+and longitude.
+
+* Version 0.0.1
 
 ### How do I get set up? ###
 
@@ -20,16 +20,8 @@ This README would normally document whatever steps are necessary to get your app
     2. Go to `/opt/*ampp/bin`
     3. Execute: `sudo ./pecl install geoip`
     4. Add the following to `/opt/*ampp/php.ini`: `extension=geoip.so`
-* How to run tests
 * Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
-* Other community or team contact
+* Use github for contact.

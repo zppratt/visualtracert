@@ -1,7 +1,9 @@
 <?php
 
-/* 
- * Ensures that the IP sent by the client is in the correct format and returns the ip address extracted
+/**
+ * Ensures that the IP sent by the client is in the correct format and returns the ip address extracted.
+ * @param JSON $request A client request in JSON form, most likely contains hostname or IP to be translated.
+ * @return The translated ip address or error message. 
  */
 function validateClientRequest($request) {
 	/* Decoding the JSON object in a php array */
@@ -10,7 +12,10 @@ function validateClientRequest($request) {
 	/* Translating request (hostname, IP address, or else) into an IPV4 IP address*/
 	$ipAddress = gethostbyname($request['ip']);
 
-	/* ipAddress is supposed to have the format of an IP address. If it doesn't, it means the translation into an IP has failed (invalid hostname or else) */
+	/* 
+	 * ipAddress is supposed to have the format of an IP address. If it doesn't, it means the translation into an IP
+	 * has failed (invalid hostname or else) 
+	*/
 	$ipAddress = filter_var($ipAddress, FILTER_VALIDATE_IP);
 	if($ipAddress == FALSE) {
 		exit(json_encode(array('Error' => "Couldn't translate the hostname into an IP address")));
@@ -44,12 +49,12 @@ function validateClientRequest($request) {
 	return $ipAddress;
 }
 
-/* 
- * Parses the results of traceroute and returns the first valid IP address found
- * Returns NULL if no IP addresses found
+/**
+ * Parses the results of traceroute and returns the first valid IP address found.
+ * @param JSON $tracerouteOutput The results of the traceroute.
+ * @return The first valid ip, otherwise null.
  */
 function parseTraceroute($tracerouteOutput) {
-
 	for($i=1; $i<count($tracerouteOutput); $i++){	// Scouring all responses from traceroute (except the first line that we know is just descriptive)
 
 		$tracerouteOutput[$i] = str_replace("(", "", $tracerouteOutput[$i]);	// Removes the parenthesis in the output before it is exploded according to spaces
@@ -66,27 +71,10 @@ function parseTraceroute($tracerouteOutput) {
 	return NULL;	// Return NULL if no IP addresses returned by traceroute
 }
 
-
-/* 
- * Execute the 1 traceroute call to find 1 hop located at $TTL hops and return its IP address, or NULL if not found
- */
-function traceroute1Hop($ipAddress, $TTL) {
-	$returnValue;
-	$tracerouteOutput = NULL;
-	exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue);
-
-	if($returnValue != 0) {	// Error during the execution of traceroute
-		echo json_encode(array("Error" => "Traceroute returned an error code "));
-		exit(1);
-	}
-
-	return(parseTraceroute($tracerouteOutput)); // Returns the IP address of the hop found, or NULL if nothing found
-}
-
-
-/* 
+/**
  * Execute the traceroute call and returns the IP addresses of the hops
  * TODO: make sure exec() finishes its execution and take care of the timeout
+ * @param JSON $ipAddress The destination IP.
  */
 function executeTraceroute($ipAddress) {
 	$returnValue;
@@ -116,6 +104,25 @@ function executeTraceroute($ipAddress) {
 									// Might consider modifying so that counts only consecutive not found hops
 
 	return $tracerouteArray;
+}
+
+/**
+ * Execute the 1 traceroute call to find 1 hop located at $TTL hops and return its IP address, or NULL if not found
+ * @param string $ipAddress The ip address to execute the traceroute call on.
+ * @param int $TTL The incremental TTL on the packet.
+ * @return The IP address of the hop found, or NULL if nothing found
+ */
+function traceroute1Hop($ipAddress, $TTL) {
+    $returnValue;
+    $tracerouteOutput = NULL;
+    exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue);
+
+    if($returnValue != 0) {	// Error during the execution of traceroute
+        echo json_encode(array("Error" => "Traceroute returned an error code "));
+        exit(1);
+    }
+
+    return(parseTraceroute($tracerouteOutput)); // Returns the IP address of the hop found, or NULL if nothing found
 }
 
 ?>

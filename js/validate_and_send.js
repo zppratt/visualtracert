@@ -1,6 +1,10 @@
-function ValidateIPaddress(ipaddress) {
-    
-    if (validator.isIP(ipaddress) || validator.isURL(ipaddress)) {
+/**
+ * Checks if the user's entered destination host/ip is generally in the correct format.
+ * @param address The destination host/ip to check
+ * @returns {Boolean} True if the host/ip is valid, false otherwise.
+ */
+function ValidateIPaddress(address) {    
+    if (validator.isIP(address) || validator.isURL(address)) {
         $('#error').text("");
         $('#tracerouteOutput').empty();	// Clears traceroute output before rewritting on it
         $('#tracerouteWarnings').empty();
@@ -11,6 +15,11 @@ function ValidateIPaddress(ipaddress) {
     }
 }
 
+/**
+ * Sends the traceroute request using either the geolite or arin method.
+ * @param ipaddress The destination IP.
+ * @param TTL The initial time-to-live for the traceroute packets.
+ */
 function sendTracerouteRequest(ipaddress, TTL) {    
 	var httpRequest = new XMLHttpRequest();
 		
@@ -36,6 +45,11 @@ function sendTracerouteRequest(ipaddress, TTL) {
 	console.log("Sent: " + JSON.stringify({ip:ipaddress, database:selectedDB, TTL:TTL})); // Just in case for debugging, will remove later 
 }
 
+/**
+ * Processes the server response and sends the next request.
+ * @param serverResponse The response from the server.
+ * @param TTL The time-to-live on the request, increases with each request.
+ */
 function processResponse(serverResponse, TTL) {
 	if("Error" in serverResponse) {
 		$('#error').text(serverResponse["Error"]);
@@ -60,6 +74,10 @@ function processResponse(serverResponse, TTL) {
 
 }
 
+/**
+ * Updates the display of the route on the page.
+ * @param traceroute The array of nodes in the route.
+ */
 function updateIPArray(traceroute) {
 	$('#tracerouteOutput').html('<table><tr><th>#</th><th>IP</th><th>Location</th></tr></table>');
 	for (var i=0; i < traceroute.length; i++) {
@@ -69,9 +87,14 @@ function updateIPArray(traceroute) {
 	}
 }
 
-function updateWarnings(warning, warningNb) {
+/**
+ * Updates the list of warnings from the server on the page.
+ * @param warning The warning to add to the page.
+ * @param warningNode The node/hop the warning occured on.
+ */
+function updateWarnings(warning, warningNode) {
 	if($('#tracerouteWarnings table')[0] == null) { // Table not created yet
 		$('#tracerouteWarnings').html('<table><tr><th>#</th><th>Warnings</th></tr></table>');
 	}
-	$('#tracerouteWarnings table').append("<tr><td>"+warningNb+"</td><td>"+warning+"</td></tr>");
+	$('#tracerouteWarnings table').append("<tr><td>"+warningNode+"</td><td>"+warning+"</td></tr>");
 }
