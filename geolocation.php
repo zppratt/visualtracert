@@ -101,7 +101,6 @@ function geolocation($ipAddress) {
 	}
 	else
 		return NULL;
-
 }
 
 ?>

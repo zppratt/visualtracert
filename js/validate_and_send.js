@@ -29,7 +29,7 @@ function sendTracerouteRequest(ipaddress, TTL) {
 	else
 		selectedDB = 1;
 
-	httpRequest.open("POST", "traceroute.php", true);
+	httpRequest.open("POST", "request.php", true);
 	httpRequest.setRequestHeader("Content-type", "application/json");
 	httpRequest.send(JSON.stringify({ip:ipaddress, database:selectedDB, TTL:TTL}));
 
