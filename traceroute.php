@@ -29,13 +29,13 @@ function validateClientRequest($request) {
 
 	/* Retrieving the selected database to use */
 	if($request['database'] != 0 && $request['database'] != 1) {
-		$GLOBALS['Warning'] .= "Invalid database selected, using GeoLite instead".'<br/>';
+		$GLOBALS['Warning'] .= "Invalid database selected, using GeoLite instead\n";
 	}
 	else
 		$GLOBALS['Database'] = $request['database'];
 
 	if($request['TTL'] < 1 || $request['TTL'] > 64) {
-		$GLOBALS['Warning'] .= "Invalid TTL value, set to 1 instead".'<br/>';
+		$GLOBALS['Warning'] .= "Invalid TTL value, set to 1 instead\n";
 	}
 	else {
 		$GLOBALS['TTL'] = $request['TTL'];
@@ -127,14 +127,13 @@ $requestReceived = file_get_contents('php://input');
 
 $ipAddress = validateClientRequest($requestReceived);
 
-//$nextHop = executeTraceroute($ipAddress);
-$nextHop = array(traceroute1Hop($ipAddress, $GLOBALS['TTL']));
-if($nextHop[0] == NULL)
-	$GLOBALS['Warning'] .= "Couldn't be resolved".'<br/>';
+$nextHop = traceroute1Hop($ipAddress, $GLOBALS['TTL']);
+if($nextHop == NULL)
+	$GLOBALS['Warning'] .= "Host couldn't be resolved\n";
 
-if(!isset($_SESSION['LastHop'])  || isset($_SESSION['LastHop']) && $_SESSION['LastHop'] != $nextHop[0]) { // TODO: take care of case where $nextHop is NULL
+if(!isset($_SESSION['LastHop'])  || isset($_SESSION['LastHop']) && $_SESSION['LastHop'] != $nextHop) {
 	$moreHops = TRUE;
-	$_SESSION['LastHop'] = $nextHop[0];
+	$_SESSION['LastHop'] = $nextHop;
 }
 
 
@@ -148,12 +147,16 @@ require('geolocation.php');
 
 $resultsArray = Array();
 
-if($nextHop[0] != NULL)
+if($nextHop != NULL) {
 	$resultsArray['Data'] = geolocation($nextHop);
+	$resultsArray['Found'] = TRUE;
+} else {
+	$resultsArray['Found'] = FALSE;
+}
 
 if(empty($resultsArray['Data'])) {
-	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));
-	exit(1);
+	$GLOBALS['Warning'] .= "No information could be retrieved from the given IP address";
+	$resultsArray['Found'] = FALSE;
 }
 
 if($moreHops == TRUE) { 
@@ -162,38 +165,6 @@ if($moreHops == TRUE) {
 $resultsArray['Warning']=$GLOBALS['Warning'];
 
 echo json_encode($resultsArray);
-
-exit();
-
-/* 
- * 
- * Geolocation of each IP address 
- *
- * TO BE DELETED WHEN WE AGREE ON WHAT IS DONE
- *
- */
-require_once('geolocation.php');
-
-$addressPerIp = array();
-
-// TODO: verify the curl answer each time. If null, inform client side
-/* TODO: optimize the number of REST calls by looking at the range of the ip address for each: if next ip address in range of
- * 		 the previous one, no need to call again, the information retrieved will be the same
- * It really takes a long time to execute this code right now 
- */
-
-foreach($nextHop as $ipAddress) {
-	$temp = arinApiCall($ipAddress);
-	if($temp != NULL)
-		array_push($addressPerIp, $temp);
-}
-
-if(empty($addressPerIp)) {
-	echo json_encode(array('Error' => 'No information could be retrieved from the given IP address'));
-	exit(1);
-}
-
-echo json_encode($addressPerIp);
 
 exit();
 

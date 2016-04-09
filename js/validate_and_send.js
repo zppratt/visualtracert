@@ -43,13 +43,13 @@ function processResponse(serverResponse, TTL) {
 	}
 	else if("MoreHops" in serverResponse) {
 		sendTracerouteRequest(ipaddress, TTL+1);
-		traceroute.push(serverResponse['Data'][0]);
+		traceroute.push(serverResponse['Data']);
 		updateIPArray(traceroute);
 		if("Warning" in serverResponse && serverResponse['Warning'] != '')
 			updateWarnings(serverResponse['Warning'], traceroute.length);
 	}
 	else {
-		traceroute.push(serverResponse['Data'][0]);
+		traceroute.push(serverResponse['Data']);
 		updateIPArray(traceroute);		
 		plotOnMap(traceroute);	// Calls for plotting points on map
 	}

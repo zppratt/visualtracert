@@ -82,30 +82,26 @@ function arinApiCall($ipAddress) {
 	return $addressArray;
 }
 
-function geolocation($hopsIpAddresses) {
-	$addressPerIp = array();
+function geolocation($ipAddress) {
 
 	if($GLOBALS['Database'] == 0){
-		foreach($hopsIpAddresses as $ipAddress) {
-			$temp = geoip_record_by_name($ipAddress);
-			if($temp != FALSE) {
-				$temp['IP'] = $ipAddress;
-				array_push($addressPerIp, $temp);
-			}
+		$location = geoip_record_by_name($ipAddress);
+		if($location != FALSE) {
+			$location['IP'] = $ipAddress;
+			return $location;
 		}
 	}
 
 	else if($GLOBALS['Database'] == 1) {
-		foreach($hopsIpAddresses as $ipAddress) {
-			$temp = arinApiCall($ipAddress);
-			if($temp != NULL) {
-				$temp['IP'] = $ipAddress;
-				array_push($addressPerIp, $temp);
-			}
+		$location = arinApiCall($ipAddress);
+		if($location != NULL) {
+			$location['IP'] = $ipAddress;
+			return $location;
 		}
 	}
+	else
+		return NULL;
 
-	return $addressPerIp;
 }
 
 ?>
