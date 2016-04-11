@@ -48,7 +48,7 @@ function sendTracerouteRequest(ipaddress, TTL) {
 /**
  * Processes the server response and sends the next request.
  * @param serverResponse The response from the server.
- * @param TTL The time-to-live on the request, increases with each request.
+ * @param TTL The time-to-live on the request
  */
 function processResponse(serverResponse, TTL) {
 	if("Error" in serverResponse) {
@@ -56,13 +56,13 @@ function processResponse(serverResponse, TTL) {
 		console.log("Error detected in server's response: " + serverResponse["Error"]);	
 	}
 	else if("MoreHops" in serverResponse) {
-		sendTracerouteRequest(ipaddress, TTL+1);
+		sendTracerouteRequest(serverResponse['FinalHop'], serverResponse['NextTTL']); // Contacting server again for next hop or same if not found
 		if(serverResponse['Found']==true) {
 			traceroute.push(serverResponse['Data']);
 			updateIPArray(traceroute);
 		}
 		if("Warning" in serverResponse && serverResponse['Warning'] != '')
-			updateWarnings(serverResponse['Warning'], traceroute.length);
+			updateWarnings(serverResponse['Warning'], TTL);
 	}
 	else {
 		if(serverResponse['Found']==true) {

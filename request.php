@@ -12,6 +12,7 @@ session_start();
 $GLOBALS['Database'] = 0;
 $GLOBALS['Warning'] = '';
 $GLOBALS['TTL'] = 1;
+$GLOBALS['FinalHop'] = '';
 
 require('traceroute.php');
 
@@ -19,12 +20,19 @@ require('traceroute.php');
 $requestReceived = file_get_contents('php://input');
 
 $ipAddress = validateClientRequest($requestReceived);
+$GLOBALS['FinalHop'] = $ipAddress;
 
-$nextHop = traceroute1Hop($ipAddress, $GLOBALS['TTL']);
+/* Tries to find the next hop in less than 2 attemps
+ * TODO: define whether these new attemps are worth the additional time or not
+ */
+for($i=0; $i<2; $i += 1) {
+	$nextHop = traceroute1Hop($ipAddress, $GLOBALS['TTL']);
+	if($nextHop != NULL)
+		break;
+}
 
 if ($nextHop == NULL) {
 	$GLOBALS['Warning'] .= "Host couldn't be resolved. \n";
-	$GLOBALS['TTL'] += 1;
 
 	if (!isset($_SESSION['AttemptsNb']))
 		$_SESSION['AttemptsNb'] = 0;
@@ -64,7 +72,11 @@ if (empty($resultsArray['Data'])) {
 
 if ($moreHops == TRUE) { 
 	$resultsArray["MoreHops"]=True;
+	$resultsArray['NextTTL'] = $GLOBALS['TTL']+1;
 }
+
+$resultsArray['FinalHop'] = $GLOBALS['FinalHop'];
+
 $resultsArray['Warning']=$GLOBALS['Warning'];
 
 $resultsArray['AttemptsNb'] = $_SESSION['AttemptsNb'];
