@@ -11,7 +11,8 @@ function initialize() {
     var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        center: {lat: 28.540, lng: -100.546}
+        center: {lat: 28.540, lng: -100.546},
+        scrollwheel: false
     };
     $.get("http://ipinfo.io", function(response) {
         var currentLocation = response.city + ", " + response.region
@@ -29,7 +30,8 @@ function initialize() {
                         center: {
                             lat: geocode_results[0].geometry.location.lat(),
                             lng: geocode_results[0].geometry.location.lng()
-                        }
+                        },
+                        scrollwheel: false
                     };
                 }
                 var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
