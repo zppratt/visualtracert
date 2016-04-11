@@ -58,18 +58,23 @@ function processResponse(serverResponse, TTL) {
 	else if("MoreHops" in serverResponse) {
 		sendTracerouteRequest(serverResponse['FinalHop'], serverResponse['NextTTL']); // Contacting server again for next hop or same if not found
 		if(serverResponse['Found']==true) {
-			traceroute.push(serverResponse['Data']);
-			updateIPArray(traceroute);
+			geolocateAndUpdate(serverResponse['Data'], false);
+			//traceroute.push(serverResponse['Data']);
+			//updateIPArray(traceroute);
 		}
 		if("Warning" in serverResponse && serverResponse['Warning'] != '')
 			updateWarnings(serverResponse['Warning'], TTL);
 	}
 	else {
 		if(serverResponse['Found']==true) {
-			traceroute.push(serverResponse['Data']);
+			//traceroute.push(serverResponse['Data']);
+			geolocateAndUpdate(serverResponse['Data'], true);
+			//updateIPArray(traceroute);
+		}
+		else {	// Last result not found but no more hops: need to plot
 			updateIPArray(traceroute);
-		}	
-		plotOnMap(traceroute);	// Calls for plotting points on map after all data has been received (How to plot when still receiving data?)
+			plotOnMap(traceroute);
+		}
 	}
 
 }

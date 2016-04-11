@@ -39,24 +39,22 @@ function initialize() {
 
 /**
  * Plots the points on the map using either method.
- * @param serverResponse
+ * @param traceroute
  */
-function plotOnMap(serverResponse) {
-    if (serverResponse.length == 0)
+function plotOnMap(traceroute) {
+    if (traceroute.length == 0)
         return;
-    if (serverResponse[0].latitude == null) // Arin specific answer
-        plotOnMapArin(serverResponse);
-    else
-        plotOnMapGeoLite(serverResponse);
+    plotOnMapGeoLite(traceroute);
     // Clear the loading gif and error messages
+
     $('#error').empty();
 }
 
 /**
  * Plots polylines on map for GeoLite specific answer
- * @param serverResponse
+ * @param traceroute
  */
-function plotOnMapGeoLite(serverResponse){
+function plotOnMapGeoLite(traceroute){
     var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -65,11 +63,11 @@ function plotOnMapGeoLite(serverResponse){
     var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
     var myTrip = [];
 
-    for (var i=0; i < serverResponse.length; i++) {
+    for (var i=0; i < traceroute.length; i++) {
        
         myTrip.push({
-            lat : serverResponse[i].latitude,
-            lng : serverResponse[i].longitude,
+            lat : traceroute[i].latitude,
+            lng : traceroute[i].longitude,
         });
         console.log(myTrip);
         flightPath = new google.maps.Polyline({
@@ -82,54 +80,38 @@ function plotOnMapGeoLite(serverResponse){
     }
 }
 
+
 /**
- * Maps plotting with geocoding - to be reused when not enough data on server response (no lat/long)
- * TODO: verify each field before trying to retrieve lat/long from the address (field might be null)
- * @param serverResponse
+ * Maps geolocation with geocoding - if no lat/long in response, geocodes the address returned and updates the display 
+ * (IP's and plotting when done)
+ * @param result, data result from the server containing IP, address and potentially lat/long
+ * @param plotting, boolean: plots the points on the map when true, only updates the IP array otherwise
  */
-function plotOnMapArin(serverResponse){
-	var mapProp = {
-        zoom: 4,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        center: {lat: 28.540, lng: -100.546}
-    };
-    var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-	var geocoder = new google.maps.Geocoder();
-	var myTrip = [];
-
-    for (var i=0; i < serverResponse.length; i++) {
-    	/* 
-    	 * Terrible code but only temporary - for testing purposes 
-    	 * Reduces the probability of getting an OVER_QUERY_LIMIT response and can actually display every point on the map
-    	 * Some points are not displayed when too many queries - doesn't retry automatically 
-    	 */
-    	if (i != 0 && serverResponse[i].city == serverResponse[i-1].city)
-    		continue;
-
-    	/*
-		 * The geocoder's callback function makes the plotting out f order - and it matters for polylines
-		 * Consider Reordering "my trip" each time so we keep a consistent path
-    	 */
-        geocoder.geocode({
-            'address' : /*serverResponse[i].streetAddress + ", " + */serverResponse[i].city + ", " + serverResponse[i].state + " " 
-            + serverResponse[i].postalCode + ", " + serverResponse[i].country // Street address returns sometimes no results -- Disabled for presentation
-        }, function(geocode_results, status) {
-        	if (status != google.maps.GeocoderStatus.OK) {
-        		console.log(status);
-        	}
-            else if (status == google.maps.GeocoderStatus.OK) {
-                myTrip.push({
-                    lat : geocode_results[0].geometry.location.lat(),
-                    lng : geocode_results[0].geometry.location.lng()
-                });
-                flightPath = new google.maps.Polyline({
-                    path : myTrip,
-                    strokeColor : "#FF0000",
-                    strokeWeight : 2,
-                    strokeOpacity : 0.8,
-                    map : map
-                });
-            }
-        });
+function geolocateAndUpdate(result, plotting) {
+    if(result['latitude'] != null && result['longitude'] != null) {
+        traceroute.push(result);
+        updateIPArray(traceroute);
+        if(plotting == true)
+            plotOnMap(traceroute);
+        return;
     }
+    var geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({
+                        'address' : result.city + ", " + result.region + " " 
+                        + result.postal_code + ", " + result.country_code 
+            }, function(geocode_results, status) {
+                if (status != google.maps.GeocoderStatus.OK) {
+                    console.log(status);
+                }
+                else if (status == google.maps.GeocoderStatus.OK) {
+                    result['latitude'] = geocode_results[0].geometry.location.lat();
+                    result['longitude'] = geocode_results[0].geometry.location.lng();
+                    traceroute.push(result);
+                    updateIPArray(traceroute);
+                    if(plotting == true) {  // Plots only when no more hops are to be geocoded
+                        plotOnMap(traceroute);  // Calls for plotting points on map after all data has been received (How to plot when still receiving data?)
+                    }
+                }
+    });
 }
