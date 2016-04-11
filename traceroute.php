@@ -115,7 +115,7 @@ function executeTraceroute($ipAddress) {
 function traceroute1Hop($ipAddress, $TTL) {
     $returnValue;
     $tracerouteOutput = NULL;
-    exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue);
+    exec("traceroute -n -q 2 -w 2 -f ".$TTL." -m ".$TTL." ".$ipAddress, $tracerouteOutput, $returnValue);
 
     if($returnValue != 0) {	// Error during the execution of traceroute
         echo json_encode(array("Error" => "Traceroute returned an error code "));
