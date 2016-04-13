@@ -117,11 +117,11 @@ function traceroute1Hop($ipAddress, $TTL) {
     $tracerouteOutput = NULL;
     if(strtoupper(substr(PHP_OS, 0, 3)) === 'DAR')
     {
-    	exec("traceroute -n -q 2 -w 2 -M " .$TTL. " -m " .($TTL+1)." " .$ipAddress, $tracerouteOutput, $returnValue);
+    	exec("traceroute -n -q 1 -w 2 -M " .$TTL. " -m " .($TTL+1)." " .$ipAddress, $tracerouteOutput, $returnValue);
     }
     else
     {
-    	exec("traceroute -n -q 2 -w 2 -f ".$TTL." -m ".($TTL+1)." ".$ipAddress, $tracerouteOutput, $returnValue);
+    	exec("traceroute -n -q 1 -w 2 -f ".$TTL." -m ".($TTL+1)." ".$ipAddress, $tracerouteOutput, $returnValue);
     }
     if($returnValue != 0) {	// Error during the execution of traceroute
         echo json_encode(array("Error" => "Traceroute returned an error code "));
