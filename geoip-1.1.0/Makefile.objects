@@ -1,0 +1,8 @@
+geoip.lo: /Applications/XAMPP/htdocs/geoip-1.1.0/geoip.c
+	$(LIBTOOL) --mode=compile $(CC)  -I. -I/Applications/XAMPP/htdocs/geoip-1.1.0 $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS)  -c /Applications/XAMPP/htdocs/geoip-1.1.0/geoip.c -o geoip.lo 
+$(phplibdir)/geoip.la: ./geoip.la
+	$(LIBTOOL) --mode=install cp ./geoip.la $(phplibdir)
+
+./geoip.la: $(shared_objects_geoip) $(GEOIP_SHARED_DEPENDENCIES)
+	$(LIBTOOL) --mode=link $(CC) $(COMMON_FLAGS) $(CFLAGS_CLEAN) $(EXTRA_CFLAGS) $(LDFLAGS) -o $@ -export-dynamic -avoid-version -prefer-pic -module -rpath $(phplibdir) $(EXTRA_LDFLAGS) $(shared_objects_geoip) $(GEOIP_SHARED_LIBADD)
+

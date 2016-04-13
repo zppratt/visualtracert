@@ -60,7 +60,8 @@ function plotOnMapGeoLite(traceroute){
     var mapProp = {
         zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        center: {lat: 28.540, lng: -100.546}
+        center: {lat: 28.540, lng: -100.546},
+        scrollwheel: false
     };
     var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
     var myTrip = [];

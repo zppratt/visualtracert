@@ -22,8 +22,9 @@ $requestReceived = file_get_contents('php://input');
 $ipAddress = validateClientRequest($requestReceived);
 $GLOBALS['FinalHop'] = $ipAddress;
 
-/* Tries to find the next hop in less than 2 attemps
- * TODO: define whether these new attemps are worth the additional time or not
+/** 
+ * Tries to find the next hop in less than 2 attempts
+ * TODO: define whether these new attempts are worth the additional time or not
  */
 for($i=0; $i<2; $i += 1) {
 	$nextHop = traceroute1Hop($ipAddress, $GLOBALS['TTL']);
