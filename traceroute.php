@@ -115,8 +115,14 @@ function executeTraceroute($ipAddress) {
 function traceroute1Hop($ipAddress, $TTL) {
     $returnValue;
     $tracerouteOutput = NULL;
-    exec("traceroute -n -q 2 -w 10 -f ".$TTL." -m ".($TTL+1)." ".$ipAddress, $tracerouteOutput, $returnValue);
-
+    if(strtoupper(substr(PHP_OS, 0, 3)) === 'DAR')
+    {
+    	exec("traceroute -n -q 2 -w 10 -M " .$TTL. " -m " .($TTL+1)." " .$ipAddress, $tracerouteOutput, $returnValue);
+    }
+    else
+    {
+    	exec("traceroute -n -q 2 -w 10 -f ".$TTL." -m ".($TTL+1)." ".$ipAddress, $tracerouteOutput, $returnValue);
+    }
     if($returnValue != 0) {	// Error during the execution of traceroute
         echo json_encode(array("Error" => "Traceroute returned an error code "));
         exit(1);
