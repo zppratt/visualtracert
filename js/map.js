@@ -72,8 +72,13 @@ function plotOnMapGeoLite(traceroute){
             map : map
         });
     }
-    // add here where we want the center of the map to be displayed
-    //map.setCenter(lat: , lng: );
+
+    /* Center on the supposed center of the polyline */
+    var position = {
+        lat: (traceroute[0].latitude + traceroute[traceroute.length-1].latitude)/2,
+        lng: (traceroute[0].longitude + traceroute[traceroute.length-1].longitude)/2
+    };
+    map.setCenter(position);
 }
 
 
