@@ -3,6 +3,7 @@
  * Global variables
  */
 var traceroute = [];
+var map;
 
 /**
  * Initializes a blank map (nothing drawn on it) in the HTML page.
@@ -24,17 +25,13 @@ function initialize() {
                     console.log(status);
                 }
                 else if (status == google.maps.GeocoderStatus.OK) {
-                    var mapProp = {
-                        zoom: 6,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP,
-                        center: {
+                    mapProp.zoom = 6;
+                    mapProp.center = {
                             lat: geocode_results[0].geometry.location.lat(),
                             lng: geocode_results[0].geometry.location.lng()
-                        },
-                        scrollwheel: false
-                    };
+                        };
                 }
-                var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+                map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
         });
     }, "jsonp");
 }
@@ -57,13 +54,7 @@ function plotOnMap(traceroute) {
  * @param traceroute
  */
 function plotOnMapGeoLite(traceroute){
-    var mapProp = {
-        zoom: 4,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        center: {lat: 28.540, lng: -100.546},
-        scrollwheel: false
-    };
-    var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+    map.setZoom(4);
     var myTrip = [];
 
     for (var i=0; i < traceroute.length; i++) {
@@ -81,6 +72,19 @@ function plotOnMapGeoLite(traceroute){
             map : map
         });
     }
+    // add here where we want the center of the map to be displayed
+    //map.setCenter(lat: , lng: );
+}
+
+
+function drawMarker(lat, long) {
+    var position = {lat: lat, lng: long};
+    var marker = new google.maps.Marker({
+        position: position,
+        map: map
+    });
+    map.setZoom(4);
+    map.setCenter(position);
 }
 
 
@@ -94,6 +98,7 @@ function geolocateAndUpdate(result, plotting) {
     if(result['latitude'] != null && result['longitude'] != null) {
         traceroute.push(result);
         updateIPArray(traceroute);
+        drawMarker(result['latitude'], result['longitude']);
         if(plotting == true)
             plotOnMap(traceroute);
         return;
@@ -110,6 +115,7 @@ function geolocateAndUpdate(result, plotting) {
                 else if (status == google.maps.GeocoderStatus.OK) {
                     result['latitude'] = geocode_results[0].geometry.location.lat();
                     result['longitude'] = geocode_results[0].geometry.location.lng();
+                    drawMarker(result['latitude'], result['longitude']);
                     traceroute.push(result);
                     updateIPArray(traceroute);
                     if(plotting == true) {  // Plots only when no more hops are to be geocoded

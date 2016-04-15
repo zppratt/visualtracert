@@ -59,17 +59,13 @@ function processResponse(serverResponse, TTL) {
 		sendTracerouteRequest(serverResponse['FinalHop'], serverResponse['NextTTL']); // Contacting server again for next hop or same if not found
 		if(serverResponse['Found']==true) {
 			geolocateAndUpdate(serverResponse['Data'], false);
-			//traceroute.push(serverResponse['Data']);
-			//updateIPArray(traceroute);
 		}
 		if("Warning" in serverResponse && serverResponse['Warning'] != '')
 			updateWarnings(serverResponse['Warning'], TTL);
 	}
 	else {
 		if(serverResponse['Found']==true) {
-			//traceroute.push(serverResponse['Data']);
 			geolocateAndUpdate(serverResponse['Data'], true);
-			//updateIPArray(traceroute);
 		}
 		else {	// Last result not found but no more hops: need to plot
 			updateIPArray(traceroute);
