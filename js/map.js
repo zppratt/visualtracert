@@ -4,6 +4,8 @@
  */
 var traceroute = [];
 var map;
+var flightPath = null;
+var markers = [];
 
 /**
  * Initializes a blank map (nothing drawn on it) in the HTML page.
@@ -64,14 +66,14 @@ function plotOnMapGeoLite(traceroute){
             lng : traceroute[i].longitude,
         });
         console.log(myTrip);
-        flightPath = new google.maps.Polyline({
-            path : myTrip,
-            strokeColor : "#FF0000",
-            strokeWeight : 2,
-            strokeOpacity : 0.8,
-            map : map
-        });
     }
+    flightPath = new google.maps.Polyline({
+        path : myTrip,
+        strokeColor : "#FF0000",
+        strokeWeight : 2,
+        strokeOpacity : 0.8,
+        map : map
+    });
 
     /* Center on the supposed center of the polyline */
     var position = {
@@ -82,14 +84,31 @@ function plotOnMapGeoLite(traceroute){
 }
 
 
+/**
+ *  Draw a simple marker on the map at the given lat/long
+ * @param lat, the latitude of the wanted position
+ * @param long, the longitude of the wanted position
+ */
 function drawMarker(lat, long) {
     var position = {lat: lat, lng: long};
     var marker = new google.maps.Marker({
         position: position,
         map: map
     });
+    markers.push(marker);
     map.setZoom(4);
     map.setCenter(position);
+}
+
+/**
+ * Clears any marker or polyline from the map
+ */
+function clearMap() {
+    var i;
+    if(flightPath != null)
+        flightPath.setMap(null);
+    for(i=0; i<markers.length; i++)
+        markers[i].setMap(null);
 }
 
 

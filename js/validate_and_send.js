@@ -8,6 +8,7 @@ function ValidateIPaddress(address) {
         $('#error').text("");
         $('#tracerouteOutput').empty();	// Clears traceroute output before rewritting on it
         $('#tracerouteWarnings').empty();
+        clearMap(map);
         return (true); // IP address matching
     } else {
         $('#error').text("You have entered an invalid IP address or hostname!");
