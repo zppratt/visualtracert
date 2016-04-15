@@ -54,9 +54,11 @@ function arinApiCall($ipAddress) {
 	$addressArray = array();
 	if (!array_key_exists('org', $decodedOrg))
 		return NULL;
+	$addressArray['city'] = "";
 	if (array_key_exists('city', $decodedOrg['org']))
 		$addressArray['city'] = $decodedOrg['org']['city']['$'];
 
+	$addressArray['postal_code'] = "";
 	if (array_key_exists('postalCode', $decodedOrg['org']))
 		$addressArray['postal_code'] = $decodedOrg['org']['postalCode']['$'];
 
@@ -71,9 +73,11 @@ function arinApiCall($ipAddress) {
 			$addressArray['street_address'] .= $decodedOrg['org']['streetAddress']['line']['$']." ";
 	}
 
+	$addressArray['region'] = "";
 	if (array_key_exists('iso3166-2', $decodedOrg['org']))
 		$addressArray['region'] = $decodedOrg['org']['iso3166-2']['$'];
 
+	$addressArray['country_code'] = "";
 	if (array_key_exists('iso3166-1', $decodedOrg['org']) and array_key_exists('code2', $decodedOrg['org']['iso3166-1']))
 		$addressArray['country_code'] = $decodedOrg['org']['iso3166-1']['code2']['$'];
 	$addressArray['latitude'] = NULL;
