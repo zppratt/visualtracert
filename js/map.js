@@ -135,6 +135,10 @@ function geolocateAndUpdate(result, plotting) {
             }, function(geocode_results, status) {
                 if (status != google.maps.GeocoderStatus.OK) {
                     console.log(status);
+                    if(status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) { // If the geocoding happen to be too close in time to each other
+                        geolocateAndUpdate(result, plotting);                   // The response will be an OVER_QUERY_LIMIT. Thus, retrying
+                        return;
+                    }
                 }
                 else if (status == google.maps.GeocoderStatus.OK) {
                     result['latitude'] = geocode_results[0].geometry.location.lat();
