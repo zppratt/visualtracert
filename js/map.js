@@ -126,6 +126,23 @@ function geolocateAndUpdate(result, plotting) {
             plotOnMap(traceroute);
         return;
     }
+
+    /* If previous result and current result have the same address, no need to geocode again */
+    if(traceroute.length > 0) {
+        var previousResult = traceroute[traceroute.length - 1]
+        if(previousResult.city == result.city && previousResult.region == result.region 
+            && previousResult.postal_code == result.postal_code && previousResult.country_code == result.country_code) {
+            result['latitude'] = previousResult.latitude;
+            result['longitude'] = previousResult.longitude;
+            traceroute.push(result);
+            updateIPArray(traceroute);
+            drawMarker(result['latitude'], result['longitude']);
+            if(plotting == true)
+                plotOnMap(traceroute);
+            return;
+        }
+    }
+
     var geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({

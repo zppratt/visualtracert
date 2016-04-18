@@ -123,9 +123,11 @@ function geolocation($ipAddress) {
 		}
 	} else if ($GLOBALS['Database'] == 1) {
 		if(isSameIPRange($ipAddress)) {	// Returning previously stored result: no need to ping database again
-			return $_SESSION['Geolocation'];
+			$location = $_SESSION['Geolocation'];
+			$location['IP'] = $ipAddress;
+			return $location;
 		}
-		
+
 		$location = arinApiCall($ipAddress);
 		$_SESSION['Geolocation'] = $location;
 		if ($location != NULL) {
