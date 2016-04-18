@@ -65,7 +65,6 @@ function plotOnMapGeoLite(traceroute){
             lat : traceroute[i].latitude,
             lng : traceroute[i].longitude,
         });
-        console.log(myTrip);
     }
     flightPath = new google.maps.Polyline({
         path : myTrip,
@@ -74,7 +73,7 @@ function plotOnMapGeoLite(traceroute){
         strokeOpacity : 0.8,
         map : map
     });
-
+    console.log(myTrip);
     /* Center on the supposed center of the polyline */
     var position = {
         lat: (traceroute[0].latitude + traceroute[traceroute.length-1].latitude)/2,
