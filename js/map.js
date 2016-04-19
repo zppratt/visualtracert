@@ -65,7 +65,6 @@ function plotOnMapGeoLite(traceroute){
             lat : traceroute[i].latitude,
             lng : traceroute[i].longitude,
         });
-        console.log(myTrip);
     }
     flightPath = new google.maps.Polyline({
         path : myTrip,
@@ -74,7 +73,7 @@ function plotOnMapGeoLite(traceroute){
         strokeOpacity : 0.8,
         map : map
     });
-
+    console.log(myTrip);
     /* Center on the supposed center of the polyline */
     var position = {
         lat: (traceroute[0].latitude + traceroute[traceroute.length-1].latitude)/2,
@@ -127,6 +126,23 @@ function geolocateAndUpdate(result, plotting) {
             plotOnMap(traceroute);
         return;
     }
+
+    /* If previous result and current result have the same address, no need to geocode again */
+    if(traceroute.length > 0) {
+        var previousResult = traceroute[traceroute.length - 1]
+        if(previousResult.city == result.city && previousResult.region == result.region 
+            && previousResult.postal_code == result.postal_code && previousResult.country_code == result.country_code) {
+            result['latitude'] = previousResult.latitude;
+            result['longitude'] = previousResult.longitude;
+            traceroute.push(result);
+            updateIPArray(traceroute);
+            drawMarker(result['latitude'], result['longitude']);
+            if(plotting == true)
+                plotOnMap(traceroute);
+            return;
+        }
+    }
+
     var geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({
@@ -135,6 +151,10 @@ function geolocateAndUpdate(result, plotting) {
             }, function(geocode_results, status) {
                 if (status != google.maps.GeocoderStatus.OK) {
                     console.log(status);
+                    if(status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) { // If the geocoding happen to be too close in time to each other
+                        geolocateAndUpdate(result, plotting);                   // The response will be an OVER_QUERY_LIMIT. Thus, retrying
+                        return;
+                    }
                 }
                 else if (status == google.maps.GeocoderStatus.OK) {
                     result['latitude'] = geocode_results[0].geometry.location.lat();

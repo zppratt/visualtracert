@@ -110,18 +110,19 @@ function executeTraceroute($ipAddress) {
  * Execute the 1 traceroute call to find 1 hop located at $TTL hops and return its IP address, or NULL if not found
  * @param string $ipAddress The ip address to execute the traceroute call on.
  * @param int $TTL The incremental TTL on the packet.
+ * @param int $timeout The waiting time of an answer from the hop before aborting
  * @return The IP address of the hop found, or NULL if nothing found
  */
-function traceroute1Hop($ipAddress, $TTL) {
+function traceroute1Hop($ipAddress, $TTL, $timeout) {
     $returnValue;
     $tracerouteOutput = NULL;
     if(strtoupper(substr(PHP_OS, 0, 3)) === 'DAR')
     {
-    	exec("traceroute -n -q 2 -w 2 -M " .$TTL. " -m " .($TTL+1)." " .$ipAddress, $tracerouteOutput, $returnValue);
+    	exec("traceroute -n -q 2 -w ".$timeout." -M " .$TTL. " -m " .($TTL+1)." " .$ipAddress, $tracerouteOutput, $returnValue);
     }
     else
     {
-    	exec("traceroute -n -q 2 -w 2 -f ".$TTL." -m ".($TTL+1)." ".$ipAddress, $tracerouteOutput, $returnValue);
+    	exec("traceroute -n -q 2 -w ".$timeout." -f ".$TTL." -m ".($TTL+1)." ".$ipAddress, $tracerouteOutput, $returnValue);
     }
     if($returnValue != 0) {	// Error during the execution of traceroute
         echo json_encode(array("Error" => "Traceroute returned an error code "));

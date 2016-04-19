@@ -18,7 +18,6 @@ function restCall($url) {
 	$curlResponse = curl_exec($curl);
 
 	if ($curlResponse === FALSE) {
-	    //$info = curl_getinfo($curl);
 	    $info = curl_error($curl);
 	    curl_close($curl);
 	    echo json_encode(array('Error' => 'An error occured during the REST call: ' . var_export($info)));
@@ -27,6 +26,30 @@ function restCall($url) {
 
 	curl_close($curl);
 	return $curlResponse;
+}
+
+
+function storeIPRange($decodedResponse) {
+	$startAddress = NULL;
+	$endAddress = NULL;
+	if (array_key_exists('net', $decodedResponse) && array_key_exists('startAddress', $decodedResponse['net'])) {
+		$startAddress = $decodedResponse['net']['startAddress']['$'];
+	}
+	if (array_key_exists('net', $decodedResponse) && array_key_exists('endAddress', $decodedResponse['net'])) {
+		$endAddress = $decodedResponse['net']['endAddress']['$'];
+	}
+	$_SESSION['startAddress'] = $startAddress;
+	$_SESSION['endAddress'] = $endAddress;
+}
+
+function isSameIPRange($ipAddress) {
+	if(!isset($_SESSION['startAddress']) || !isset($_SESSION['endAddress']))	// First time retrieving IP info
+		return FALSE;
+	if($_SESSION['startAddress'] == NULL || $_SESSION['endAddress'] == NULL) // Range previously stored not accurate
+		return FALSE;
+	if($ipAddress >= $_SESSION['startAddress'] && $ipAddress <= $_SESSION['endAddress'])
+		return TRUE;
+	return FALSE;
 }
 
 /**
@@ -39,12 +62,13 @@ function restCall($url) {
  */
 function arinApiCall($ipAddress) {
 	$curlIPRetrieval = restCall($GLOBALS['ArinRestIp'].$ipAddress.'.json');	// Calling ARIN for info on ip address
-	$decodedIp = json_decode($curlIPRetrieval, TRUE);
+	$decodedResponse = json_decode($curlIPRetrieval, TRUE);
 
-	if (!array_key_exists('net', $decodedIp) || !array_key_exists('orgRef', $decodedIp['net'])) {
+	if (!array_key_exists('net', $decodedResponse) || !array_key_exists('orgRef', $decodedResponse['net'])) {
 		return NULL;
 	}
-	$orgContactAddress = $decodedIp['net']['orgRef']['$'];	// Retrieving url to contact for address
+	storeIPRange($decodedResponse);	// Store information regarding IP range for next IP retrieval 
+	$orgContactAddress = $decodedResponse['net']['orgRef']['$'];	// Retrieving url to contact for address
 
 	/* Asks for information about the organization */
 	$curlAddressRetrieval = restCall($orgContactAddress.'.json');
@@ -98,7 +122,14 @@ function geolocation($ipAddress) {
 			return $location;
 		}
 	} else if ($GLOBALS['Database'] == 1) {
+		if(isSameIPRange($ipAddress)) {	// Returning previously stored result: no need to ping database again
+			$location = $_SESSION['Geolocation'];
+			$location['IP'] = $ipAddress;
+			return $location;
+		}
+
 		$location = arinApiCall($ipAddress);
+		$_SESSION['Geolocation'] = $location;
 		if ($location != NULL) {
 			$location['IP'] = $ipAddress;
 			return $location;
