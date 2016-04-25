@@ -7,6 +7,8 @@ var map;
 var flightPath = null;
 var markers = [];
 var startingDate;
+var duration = 0;
+var intervalID;
 
 /**
  * Initializes a blank map (nothing drawn on it) in the HTML page.
@@ -50,6 +52,7 @@ function plotOnMap(traceroute) {
     // Clear the loading gif and error messages
 
     $('#error').empty();
+    clearInterval(intervalID);
 }
 
 /**

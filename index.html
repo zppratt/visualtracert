@@ -27,8 +27,13 @@
             if (ValidateIPaddress(ipaddress) == true) {
             	traceroute = [];
             	$('#error').prepend('<img id="loading" src="img/ajax-loader.gif" />');
+            	duration = 0;
+            	$("#timer").text(duration);
+            	intervalID = setInterval(function() {
+            		duration++;
+            		$("#timer").text(duration);
+            	}, 1000);
             	startingDate = new Date().getTime();
-            	console.log(startingDate);
                 sendTracerouteRequest(ipaddress, 1);
             }
         });
@@ -62,6 +67,7 @@
 					<input type='radio' id='dbArin' name='database' value='Arin'>Arin
 				</p>
 				<div id="error"></div>
+				<p id="timer"></p>
 				<p>
 					<button type="button" id="button">Traceroute!</button>
 				</p>
