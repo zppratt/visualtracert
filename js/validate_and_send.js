@@ -52,6 +52,7 @@ function sendTracerouteRequest(ipaddress, TTL) {
  * @param TTL The time-to-live on the request
  */
 function processResponse(serverResponse, TTL) {
+	startingDate += 1000;
 	if("Error" in serverResponse) {
 		$('#error').text(serverResponse["Error"]);
 		console.log("Error detected in server's response: " + serverResponse["Error"]);	
@@ -59,18 +60,25 @@ function processResponse(serverResponse, TTL) {
 	else if("MoreHops" in serverResponse) {
 		sendTracerouteRequest(serverResponse['FinalHop'], serverResponse['NextTTL']); // Contacting server again for next hop or same if not found
 		if(serverResponse['Found']==true) {
-			geolocateAndUpdate(serverResponse['Data'], false);
+			setTimeout(function() {
+				geolocateAndUpdate(serverResponse['Data'], false);
+			}, (startingDate - new Date().getTime())>0?(startingDate - new Date().getTime()):1)
+			
 		}
 		if("Warning" in serverResponse && serverResponse['Warning'] != '')
 			updateWarnings(serverResponse['Warning'], TTL);
 	}
 	else {
 		if(serverResponse['Found']==true) {
-			geolocateAndUpdate(serverResponse['Data'], true);
+			setTimeout(function() {
+				geolocateAndUpdate(serverResponse['Data'], true);
+			}, (startingDate - new Date().getTime())>0?(startingDate - new Date().getTime()):1)
 		}
 		else {	// Last result not found but no more hops: need to plot
-			updateIPArray(traceroute);
-			plotOnMap(traceroute);
+			setTimeout(function() {
+				updateIPArray(traceroute);
+				plotOnMap(traceroute);
+			}, (startingDate - new Date().getTime())>0?(startingDate - new Date().getTime()):1)
 		}
 	}
 

@@ -6,6 +6,7 @@ var traceroute = [];
 var map;
 var flightPath = null;
 var markers = [];
+var startingDate;
 
 /**
  * Initializes a blank map (nothing drawn on it) in the HTML page.

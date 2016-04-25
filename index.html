@@ -27,6 +27,8 @@
             if (ValidateIPaddress(ipaddress) == true) {
             	traceroute = [];
             	$('#error').prepend('<img id="loading" src="img/ajax-loader.gif" />');
+            	startingDate = new Date().getTime();
+            	console.log(startingDate);
                 sendTracerouteRequest(ipaddress, 1);
             }
         });

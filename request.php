@@ -8,8 +8,6 @@
 
 session_start();
 
-sleep(1);
-
 /* Global variables */
 $GLOBALS['Database'] = 0;
 $GLOBALS['Warning'] = '';
