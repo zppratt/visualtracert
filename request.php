@@ -27,7 +27,7 @@ $GLOBALS['FinalHop'] = $ipAddress;
  * TODO: define whether these new attempts are worth the additional time or not
  */
 for($i=0; $i<2; $i += 1) {
-	$nextHop = traceroute1Hop($ipAddress, $GLOBALS['TTL'], ($i+1)*2);	// ($i+1)*2) is the timeout value: increases if a hop is not found
+	$nextHop = traceroute1Hop($ipAddress, $GLOBALS['TTL'], ($i+1)*2-1);	// ($i+1)*2) is the timeout value: increases if a hop is not found
 	if($nextHop != NULL)
 		break;
 }
