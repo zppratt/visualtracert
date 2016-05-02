@@ -46,13 +46,13 @@ function initialize() {
  * @param traceroute
  */
 function plotOnMap(traceroute) {
+    // Clear the loading gif and error messages
+    $('#error').empty();
+    clearInterval(intervalID);
+    
     if (traceroute.length == 0)
         return;
     plotOnMapGeoLite(traceroute);
-    // Clear the loading gif and error messages
-
-    $('#error').empty();
-    clearInterval(intervalID);
 }
 
 /**
